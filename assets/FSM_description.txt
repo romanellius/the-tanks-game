@@ -1,0 +1,14 @@
+FSM
+===
+alphabet - set of input symbols
+states
+initial state
+state-transition function
+final states - end
+outputs
+---
+valid state transitions - from, to, condition, callback
+current state
+===
+https://levelup.gitconnected.com/finite-state-machine-and-its-implementation-with-state-pattern-from-scratch-9732787a1277
+===

@@ -147,6 +147,9 @@ dist
 !.vscode/tasks.json
 !.vscode/*.code-snippets
 
+# VisualStudioCode extensions
+.VSCodeCounter/*
+
 # Local History for Visual Studio Code
 .history/
 

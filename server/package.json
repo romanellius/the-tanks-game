@@ -1,0 +1,11 @@
+{
+  "name": "multiplayerserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node src/main.js"
+  },
+  "author": "RAM",
+  "license": "ISC"
+}

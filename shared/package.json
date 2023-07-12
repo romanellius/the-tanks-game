@@ -1,0 +1,9 @@
+{
+  "name": "multiplayercommon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "const.js",
+  "scripts": {},
+  "author": "RAM",
+  "license": "ISC"
+}

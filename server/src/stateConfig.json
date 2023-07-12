@@ -1,0 +1,18 @@
+{
+  "@wait": {
+    "next": "roundStart"
+  },
+  "roundStart": {
+    "next": "roundInProgress"
+  },
+  "roundInProgress": {
+    "next": "roundEnd"
+  },
+  "roundEnd": {
+    "prev": "roundStart",
+    "next": "gameEnd"
+  },
+  "gameEnd": {
+    "next": "@wait"
+  }
+}

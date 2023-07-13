@@ -99,7 +99,7 @@ client.on("connect", () => {
         isFire = true;
         break;
       case "j":
-        action = "join";
+        action = "api/states/join";
         break;
       case "t":
         action = "api/V1/getUser/1";
@@ -144,7 +144,6 @@ client.on("message", (buffer, remote) => {
 
   console.log(`> ${buffer.toString()}\n`);
 
-  ///TODO: use parse below:
   /*
   JSON.parse(string, (_, value) => {
     if(typeof value === 'object' && value !== null) {

@@ -5,7 +5,7 @@ const configObject = require("../iocConfig");
 
 //init
 const container = {};
-build(configObject);
+build(container, configObject);
 
 //private functions
 function validateConfiguration(configObject) {
@@ -42,7 +42,13 @@ function validateConfiguration(configObject) {
   }
 }
 
-function registerDependency(name, argDependencies = [], handler, isSingleton) {
+function registerDependency(
+  container,
+  name,
+  argDependencies = [],
+  handler,
+  isSingleton
+) {
   if (container[name]) {
     throw `IocContainer: Can not register '${name}' dependency: occupied`;
   }
@@ -50,7 +56,7 @@ function registerDependency(name, argDependencies = [], handler, isSingleton) {
   container[name] = { argDependencies, handler, isSingleton };
 }
 
-function bindConfiguration(configObject) {
+function bindConfiguration(container, configObject) {
   for (const dependencyName in configObject) {
     const { handler, dependencies, isSingleton, path } =
       configObject[dependencyName];
@@ -61,6 +67,7 @@ function bindConfiguration(configObject) {
     }
 
     registerDependency(
+      container,
       dependencyName,
       dependencies ?? [],
       newHandler,
@@ -69,18 +76,18 @@ function bindConfiguration(configObject) {
   }
 }
 
-function build(configObject) {
+function build(container, configObject) {
   validateConfiguration(configObject);
-  bindConfiguration(configObject);
+  bindConfiguration(container, configObject);
 }
 
 //public functions
 const register = function (name, handler, argDependencies = []) {
-  registerDependency(name, argDependencies, handler, false);
+  registerDependency(container, name, argDependencies, handler, false);
   return this;
 };
 const registerSingleton = function (name, handler, argDependencies = []) {
-  registerDependency(name, argDependencies, handler, true);
+  registerDependency(container, name, argDependencies, handler, true);
   return this;
 };
 

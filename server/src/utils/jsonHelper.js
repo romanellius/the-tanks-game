@@ -1,4 +1,4 @@
-///STRINGIFY Helper///
+///JSON Helper///
 
 const stringifyWithMapDataType = (value) =>
   JSON.stringify(value, (_, value) => {

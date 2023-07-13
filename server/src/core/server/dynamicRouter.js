@@ -1,6 +1,7 @@
 ///DYNAMIC Routes///
 
 module.exports = () => {
+  //init
   const routes = [];
 
   //private functions

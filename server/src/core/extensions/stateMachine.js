@@ -17,7 +17,7 @@ const states = {};
 let initState;
 let currState;
 
-let stateRouter = server.bindRouter(/^\/api\/state/);
+let stateRouter = server.bindRouter(/^\/api\/states/);
 
 //private functions
 const getStateConfig = () => {

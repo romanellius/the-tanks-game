@@ -6,23 +6,69 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
   //init
   const routers = [defaultRouter];
 
-  //public functions
-  //"socket.send" OVERRIDDEN
-  const send = (message, callback) => {
-    for (const { address } of clients.getAll()) {
-      socket.send(message, address.port, address.ip, callback);
-    }
-  };
-
-  const tryBindEndpoint = (route, handler) => {
-    const isBound = defaultRouter.tryBind(route, handler);
+  //private functions
+  const tryBindEndpointToRouter = (router, route, handler) => {
+    const isBound = router.tryBind(route, handler);
 
     if (!isBound) {
       console.error(`Error: Route "${route}" is not valid: occupied`);
       socket.terminate();
     }
   };
-  const unbindEndpoint = (route) => defaultRouter.unbind(route);
+  const unbindEndpointFromRouter = (router, route) => router.unbind(route);
+
+  const onMessageReceived = (buffer, remote) => {
+    /*buffer.length > mtuRecommendedSize
+          ? console.warn(
+            `${remote.address.toString()}:${remote.port}> ${mtuSizeWarning}`
+          )
+          : console.log(
+            `${remote.address.toString()}:${remote.port}> ${buffer.toString()}`
+          );*/
+
+    try {
+      const data = JSON.parse(buffer.toString());
+
+      if (
+        !data?.action ||
+        !routers.some((router) => router.tryInvoke(data, remote))
+      ) {
+        throw `Router: Can not get route "${data?.action}": does not exist`;
+      }
+    } catch (error) {
+      console.error(`Error: ${error}`);
+
+      socket.send(
+        `"${buffer.toString()}" is not a valid format of data`,
+        remote.port,
+        remote.address.toString(),
+        (error) => {
+          if (error) {
+            return socket.terminate();
+          }
+
+          console.log(
+            `< "${buffer.toString().substring(0, 32)}${
+              buffer.toString().length > 32 ? "..." : ""
+            }" is not a valid format`
+          );
+        }
+      );
+    }
+  };
+
+  //public functions
+  //"socket.send" OVERRIDDEN
+  const sendMessage = (message, callback) => {
+    for (const { address } of clients.getAll()) {
+      socket.send(message, address.port, address.ip, callback);
+    }
+  };
+
+  const tryBindEndpoint = (route, handler) =>
+    tryBindEndpointToRouter(defaultRouter, route, handler);
+  const unbindEndpoint = (route) =>
+    unbindEndpointFromRouter(defaultRouter, route);
 
   const run = () => {
     socket
@@ -31,55 +77,7 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
           address: socketConfig,
         })
       )
-      .onReceive((buffer, remote) => {
-        /*buffer.length > mtuRecommendedSize
-          ? console.warn(
-            `${remote.address.toString()}:${remote.port}> ${mtuSizeWarning}`
-          )
-          : console.log(
-            `${remote.address.toString()}:${remote.port}> ${buffer.toString()}`
-          );*/
-
-        try {
-          const data = JSON.parse(buffer.toString());
-
-          //ensure data.action starts with "/"
-          if (
-            data?.action &&
-            typeof data.action === "string" &&
-            !data.action.startsWith("/")
-          ) {
-            data.action = `/${data.action}`;
-          }
-
-          if (
-            !routers.some((router) =>
-              router.tryInvoke(data?.action, data, remote)
-            )
-          ) {
-            throw `Router: Can not get route "${data?.action}": does not exist`;
-          }
-        } catch (error) {
-          console.error(`Error: ${error}`);
-
-          socket.send(
-            `"${buffer.toString()}" is not a valid format of data`,
-            remote.port,
-            remote.address.toString(),
-            (error) => {
-              if (error) {
-                return socket.terminate();
-              }
-
-              console.log(
-                `< "${buffer.toString().substring(0, 32)}${
-                  buffer.toString().length > 32 ? "..." : ""
-                }" is not a valid format`
-              );
-            }
-          );
-        }
-      })
+      .onReceive(onMessageReceived)
       .run(socketConfig);
   };
   const onRun = (callback, isCritical = false) =>
@@ -89,36 +87,10 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
     const newRouter = resolve("core/server/router", rootPattern);
     routers.push(newRouter);
 
-    //testing routers
-    // {
-    //   const routers = {
-    //     withStaticRootPattern: {},
-    //     withDynamicRootPattern: [],
-    //   };
-
-    //   if (isPatternDynamic(rootPattern)) {
-    //     routers.withDynamicRootPattern.push(newRouter);
-    //   } else {
-    //     if (!routers.withStaticRootPattern[rootPattern]) {
-    //       routers.withStaticRootPattern[rootPattern] = [];
-    //     }
-    //     routers.withStaticRootPattern[rootPattern].push(newRouter);
-    //   }
-
-    //   //
-    // }
-
-    //TODO: reuse these two functions' code (bind, unbind)
     return {
-      tryBindEndpoint: (route, handler) => {
-        const isBound = newRouter.tryBind(route, handler);
-
-        if (!isBound) {
-          console.error(`Error: Route "${route}" is not valid: occupied`);
-          socket.terminate();
-        }
-      },
-      unbindEndpoint: (route) => newRouter.unbind(route),
+      tryBindEndpoint: (route, handler) =>
+        tryBindEndpointToRouter(newRouter, route, handler),
+      unbindEndpoint: (route) => unbindEndpointFromRouter(newRouter, route),
       unbindAllEndpoints: () => newRouter.unbindAll(),
     };
   };
@@ -133,7 +105,7 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
     disconnectClient: clients.disconnect,
     clearClients: clients.clearAll,
 
-    send,
+    send: sendMessage,
 
     tryBindEndpoint,
     unbindEndpoint,

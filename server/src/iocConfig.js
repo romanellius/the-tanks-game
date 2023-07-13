@@ -36,8 +36,8 @@ module.exports = {
   //router
   "core/server/router": {
     path: "./src/core/server/router",
-    handler: (path, staticRouter, dynamicRouter, rootPatter = "/") =>
-      require(path)(staticRouter, dynamicRouter, rootPatter),
+    handler: (path, staticRouter, dynamicRouter, rootPattern = "/") =>
+      require(path)(staticRouter, dynamicRouter, rootPattern),
     dependencies: ["core/server/staticRouter", "core/server/dynamicRouter"],
   },
   "core/server/staticRouter": {

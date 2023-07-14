@@ -19,6 +19,11 @@ let currState;
 
 let stateRouter;
 
+const runtimeServerProps = {
+  stateTransitionTo: (nextInput) => isRun() && transitionTo(nextInput),
+  getStateRouter: () => stateRouter,
+};
+
 //private functions
 const getStateConfig = () => {
   const stateConfigJson = getFile("./src/stateConfig.json");
@@ -112,6 +117,20 @@ const validateConfiguration = (stateConfig, stateData) => {
   }
 };
 
+const registerStateRouter = (path) => {
+  if (stateRouter) {
+    throw "StateMachine: Router already has been registered";
+  }
+
+  stateRouter = server.bindRouter(path);
+};
+
+const bindServerProps = () => {
+  for (const propName in runtimeServerProps) {
+    server[propName] = runtimeServerProps[propName];
+  }
+};
+
 const bindStateConditions = (stateConfig) => {
   for (const stateName in stateConfig) {
     stateName.startsWith("@") && (initState = stateName);
@@ -131,19 +150,14 @@ const bindStateHandlers = (stateData) => {
   });
 };
 
-const registerStateRouter = (path) => {
-  if (stateRouter) {
-    throw "StateMachine: Router already has been registered";
-  }
-
-  stateRouter = server.bindRouter(path);
-};
-
 //public functions
 const build = (routerPattern = /^\/api\/states/) => {
   if (Object.keys(states).length) {
     throw "StateMachine: State machine already has been built";
   }
+
+  registerStateRouter(routerPattern);
+  bindServerProps();
 
   const stateConfig = getStateConfig();
   const stateData = getStateData();
@@ -151,8 +165,6 @@ const build = (routerPattern = /^\/api\/states/) => {
 
   bindStateConditions(stateConfig);
   bindStateHandlers(stateData);
-
-  registerStateRouter(routerPattern);
 };
 
 const transitionTo = (nextInput) => {
@@ -194,16 +206,6 @@ module.exports = {
         build(routerPattern);
         return this;
       },
-    },
-  ],
-  runtimeHandlers: [
-    {
-      name: "stateTransitionTo",
-      func: (nextInput) => isRun() && transitionTo(nextInput),
-    },
-    {
-      name: "getStateRouter",
-      func: () => stateRouter,
     },
   ],
   run: () => initState && run(initState),

@@ -2,15 +2,10 @@
 
 module.exports = (server, extensions) => {
   const { onRun, run, bindEndpoint, bindRouter } = server;
-  const { getConfigHandlers, getRuntimeHandlers, getRunHandlers } = extensions;
+  const { getConfigHandlers, getRunHandlers } = extensions;
 
   const props = getConfigHandlers();
-  const serverProps = getRuntimeHandlers();
   const runHandlers = getRunHandlers();
-
-  for (const propName in serverProps) {
-    server[propName] = serverProps[propName];
-  }
 
   runHandlers.forEach((runHandler) => {
     onRun(runHandler);

@@ -7,15 +7,27 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
   const routers = [defaultRouter];
 
   //private functions
-  const tryBindEndpointToRouter = (router, route, handler) => {
-    const isBound = router.tryBind(route, handler);
+  const bindEndpointToRouter = (router, route, handler) =>
+    router.bind(route, handler);
 
-    if (!isBound) {
-      console.error(`Error: Route "${route}" is not valid: occupied`);
-      socket.terminate();
-    }
+  const resolveRoutes = (router, data, remote) => {
+    const generatorRouterHandlers = router.resolveHandlers(data?.action);
+    let resolvedCount = 0;
+
+    const invokeNextRouteHandler = (doSkipRouter = false) => {
+      const routerHandlerResult = generatorRouterHandlers.next();
+
+      if (!doSkipRouter && !routerHandlerResult.done) {
+        const handler = routerHandlerResult.value;
+        handler(data, remote, invokeNextRouteHandler);
+
+        resolvedCount++;
+      }
+    };
+    invokeNextRouteHandler();
+
+    return resolvedCount > 0;
   };
-  const unbindEndpointFromRouter = (router, route) => router.unbind(route);
 
   const onMessageReceived = (buffer, remote) => {
     /*buffer.length > mtuRecommendedSize
@@ -31,7 +43,11 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
 
       if (
         !data?.action ||
-        !routers.some((router) => router.tryInvoke(data, remote))
+        !routers.reduce(
+          (isRouteResolved, router) =>
+            resolveRoutes(router, data, remote) || isRouteResolved,
+          false
+        )
       ) {
         throw `Router: Can not get route "${data?.action}": does not exist`;
       }
@@ -65,10 +81,8 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
     }
   };
 
-  const tryBindEndpoint = (route, handler) =>
-    tryBindEndpointToRouter(defaultRouter, route, handler);
-  const unbindEndpoint = (route) =>
-    unbindEndpointFromRouter(defaultRouter, route);
+  const bindEndpoint = (route, handler) =>
+    bindEndpointToRouter(defaultRouter, route, handler);
 
   const run = () => {
     socket
@@ -83,21 +97,19 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
   const onRun = (callback, isCritical = false) =>
     callbacks.onRun.add(callback, isCritical);
 
+  //"rootPattern" must start with ["/](static pattern) or [/^\/](RegExp pattern)
   const bindRouter = (rootPattern) => {
     const newRouter = resolve("core/server/router", rootPattern);
     routers.push(newRouter);
 
     return {
-      tryBindEndpoint: (route, handler) =>
-        tryBindEndpointToRouter(newRouter, route, handler),
-      unbindEndpoint: (route) => unbindEndpointFromRouter(newRouter, route),
+      bindEndpoint: (route, handler) =>
+        bindEndpointToRouter(newRouter, route, handler),
       unbindAllEndpoints: () => newRouter.unbindAll(),
     };
   };
 
   return {
-    //getAddress: socket.getAddress,
-
     getClientIds: clients.getAllIds,
     getClients: clients.getAll,
     getClientCount: clients.getCount,
@@ -107,12 +119,10 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
 
     send: sendMessage,
 
-    tryBindEndpoint,
-    unbindEndpoint,
+    bindRouter,
+    bindEndpoint,
 
     run,
     onRun,
-
-    bindRouter,
   };
 };

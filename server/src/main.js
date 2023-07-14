@@ -9,6 +9,10 @@ app
     console.log(`Server running on ${ip}:${port} (${type})\n`);
   }, true)
   .useStateMachine()
+  .bindEndpoint(/^\//, (data, _, next) => {
+    console.log(`Logger: ${data?.action}`);
+    next();
+  })
   .run();
 
 /*.bindRoute("ping", (_, remote) => {

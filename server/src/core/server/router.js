@@ -3,14 +3,32 @@
 //TODO: replace with resolve()
 const { isRegExp: isRoutePatternDynamic } = require("../../utils/regexpHelper");
 
-// [ ]  add "error handling" using routing mechanism (call bindRoute(*) after all other bindings in each state)?
-//      [https://expressjs.com/en/guide/error-handling.html]
+//TODO: "Error Handling" for Endpoints and States:
+//        next(!undefined and !"router") - skip routes/routers while "error handling" middleware is found
+//        default and user-defined error handlers
+//        try ... catch each routeHandler calling and call next(error) on exception
+//        define error-handlers middleware LAST
 
 module.exports = (rootPattern) => {
   //init
   const routes = [];
 
+  rootPattern = normalizePattern(rootPattern);
+
   //private functions
+  function normalizePattern(pattern, isRootPattern) {
+    if (
+      !pattern ||
+      pattern === "" ||
+      (isRoutePatternDynamic &&
+        (pattern.source === /()/.source || pattern.source === /(?:)/.source))
+    ) {
+      pattern = isRootPattern ? /^\// : /\//;
+    }
+
+    return pattern;
+  }
+
   const formatPath = (path) =>
     typeof path === "string" && !path.startsWith("/") ? `/${path}` : path;
 
@@ -55,11 +73,12 @@ module.exports = (rootPattern) => {
   }
 
   //public functions
-  const bind = (pattern = "/", handler) => {
+  const bind = (pattern, handler) => {
     if (typeof handler !== "function") {
       throw `Error: Route "${pattern}" can not be bound: handler is not a function`;
     }
 
+    pattern = normalizePattern(pattern);
     routes.push({ pattern, handler });
   };
 

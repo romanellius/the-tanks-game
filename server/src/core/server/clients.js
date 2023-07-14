@@ -17,7 +17,7 @@ module.exports = () => {
         { address: { ip: remote.address.toString(), port: remote.port } }
       );
 
-    callback();
+    callback && callback();
   };
   const removeClient = (remote, callback) => {
     connectedClients.delete(
@@ -27,7 +27,7 @@ module.exports = () => {
       })
     );
 
-    callback();
+    callback && callback();
   };
   /*const updateClient = (remote) => {
         connectedClients.has(

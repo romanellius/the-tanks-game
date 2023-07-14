@@ -10,14 +10,15 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
   const bindEndpointToRouter = (router, route, handler) =>
     router.bind(route, handler);
 
-  const resolveRoutes = (router, data, remote) => {
+  const invokeRoutes = (router, data, remote) => {
     const genRouterHandlers = router.resolveHandlers(data?.action);
-    let resolvedCount = 0;
 
+    let resolvedCount = 0;
     const invokeNextRouteHandler = (doSkipRouter = false) => {
       const routerHandlerResult = genRouterHandlers.next();
 
-      if (!doSkipRouter && !routerHandlerResult.done) {
+      const doInvokeNextRoute = !doSkipRouter && !routerHandlerResult.done;
+      if (doInvokeNextRoute) {
         const handler = routerHandlerResult.value;
         handler(data, remote, invokeNextRouteHandler);
 
@@ -44,8 +45,8 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
       if (
         !data?.action ||
         !routers.reduce(
-          (isRouteResolved, router) =>
-            resolveRoutes(router, data, remote) || isRouteResolved,
+          (isPathResolved, router) =>
+            invokeRoutes(router, data, remote) || isPathResolved,
           false
         )
       ) {
@@ -78,13 +79,14 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
   const sendMessage = (message, callback) => {
     for (const { address } of clients.getAll()) {
       socket.send(message, address.port, address.ip, (error) => {
-        callback();
+        callback && callback();
 
         error && socket.terminate();
       });
     }
   };
 
+  //"route" must start with ["/](static pattern) or [/\/](RegExp pattern)
   const bindEndpoint = (route, handler) =>
     bindEndpointToRouter(defaultRouter, route, handler);
 

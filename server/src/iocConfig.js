@@ -36,7 +36,7 @@ module.exports = {
   //router
   "core/server/router": {
     path: "./src/core/server/router",
-    handler: (path, rootPattern = "/") => require(path)(rootPattern),
+    handler: (path, rootPattern) => require(path)(rootPattern),
   },
 
   //protocols

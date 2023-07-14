@@ -17,7 +17,7 @@ const states = {};
 let initState;
 let currState;
 
-let stateRouter = server.bindRouter(/^\/api\/states/);
+let stateRouter;
 
 //private functions
 const getStateConfig = () => {
@@ -131,8 +131,16 @@ const bindStateHandlers = (stateData) => {
   });
 };
 
+const registerStateRouter = (path) => {
+  if (stateRouter) {
+    throw "StateMachine: Router already has been registered";
+  }
+
+  stateRouter = server.bindRouter(path);
+};
+
 //public functions
-const build = () => {
+const build = (routerPattern = /^\/api\/states/) => {
   if (Object.keys(states).length) {
     throw "StateMachine: State machine already has been built";
   }
@@ -143,6 +151,8 @@ const build = () => {
 
   bindStateConditions(stateConfig);
   bindStateHandlers(stateData);
+
+  registerStateRouter(routerPattern);
 };
 
 const transitionTo = (nextInput) => {
@@ -180,8 +190,8 @@ module.exports = {
   configHandlers: [
     {
       name: "useStateMachine",
-      func: function () {
-        build();
+      func: function (routerPattern) {
+        build(routerPattern);
         return this;
       },
     },

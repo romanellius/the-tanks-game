@@ -42,7 +42,7 @@ module.exports = (rootPattern) => {
     return formatPath(relPath);
   };
 
-  function* generatorGetRouteHandlers(routes, path) {
+  function* genGetRouteHandlers(routes, path) {
     for (const route of routes) {
       if (
         isRoutePatternDynamic(route.pattern)
@@ -69,9 +69,9 @@ module.exports = (rootPattern) => {
 
   const resolveHandlers = (path) => {
     const relPath = getRelativePath(path, rootPattern);
-    if (!relPath) return generatorGetRouteHandlers([]);
+    if (!relPath) return genGetRouteHandlers([]);
 
-    return generatorGetRouteHandlers(routes, relPath);
+    return genGetRouteHandlers(routes, relPath);
   };
 
   return {

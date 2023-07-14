@@ -11,11 +11,11 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
     router.bind(route, handler);
 
   const resolveRoutes = (router, data, remote) => {
-    const generatorRouterHandlers = router.resolveHandlers(data?.action);
+    const genRouterHandlers = router.resolveHandlers(data?.action);
     let resolvedCount = 0;
 
     const invokeNextRouteHandler = (doSkipRouter = false) => {
-      const routerHandlerResult = generatorRouterHandlers.next();
+      const routerHandlerResult = genRouterHandlers.next();
 
       if (!doSkipRouter && !routerHandlerResult.done) {
         const handler = routerHandlerResult.value;

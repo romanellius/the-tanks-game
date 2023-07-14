@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "dev": "node src/main.js"
+    "dev": "node src/main.js",
+    "_devTest": "node src/_mainWithNoStateMachine.js"
   },
   "author": "RAM",
   "license": "ISC"

@@ -1,4 +1,3 @@
-//TODO: replace with resolve()
 const jsonHelper = require("../../utils/jsonHelper");
 const { toString: flattenAddress } = require("../../utils/addressHelper");
 

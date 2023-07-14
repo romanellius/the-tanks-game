@@ -8,7 +8,7 @@ app
     const { ip, port, type } = address;
     console.log(`Server running on ${ip}:${port} (${type})\n`);
   }, true)
-  .useStateMachine()
+  .useStateMachine(/^\/api/)
   .bindEndpoint(/^\//, (data, _, next) => {
     console.log(`Logger: ${data?.action}`);
     next();

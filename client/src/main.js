@@ -99,7 +99,7 @@ client.on("connect", () => {
         isFire = true;
         break;
       case "j":
-        action = "api/states/join";
+        action = "api/join";
         break;
       case "t":
         action = "api/test";

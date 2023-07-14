@@ -3,7 +3,7 @@ const endpoints = {
   leave: "/leave",
 };
 
-// TODO: business logic does not need access to such methods as: run, onRun, bindEndpoint and etc..
+// TODO: business logic does not need access to such methods as: run, onRun, bindEndpoint and bindRouter
 module.exports = (server) => {
   const stateRouter = server.getStateRouter();
 

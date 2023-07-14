@@ -26,7 +26,7 @@ apiRouter.bindEndpoint(null, (data, _, next) => {
 });
 
 //invokes only on J
-const stateRouter = app.bindRouter("/api/states");
+const stateRouter = app.bindRouter("/api/join");
 stateRouter.bindEndpoint(/(?:)/, (data, _, next) => {
   console.log(`STATE logger: ${data?.action}`);
   next();

@@ -186,51 +186,54 @@ const endpoints = {
   update: "/update",
 };
 
-module.exports = (server) => ({
-  handler: () => {
-    worldState = global._worldState;
+module.exports = (server) => {
+  const stateRouter = server.getStateRouter();
 
-    server.tryBindEndpoint(endpoints.update, (data, remote) => {
-      //FIXME: remove with concatenation?
-      const address = JSON.stringify({
-        ip: remote.address.toString(),
-        port: remote.port,
+  return {
+    handler: () => {
+      worldState = global._worldState;
+
+      stateRouter.bindEndpoint(endpoints.update, (data, remote) => {
+        //FIXME: remove with concatenation?
+        const address = JSON.stringify({
+          ip: remote.address.toString(),
+          port: remote.port,
+        });
+
+        if (clientsData.has(address)) {
+          data.move && (clientsData.get(address).move = data.move);
+          data.isFire && (clientsData.get(address).fire = data.isFire);
+        } else {
+          clientsData.set(address, {
+            move: data.move,
+            fire: data.isFire,
+          });
+        }
       });
 
-      if (clientsData.has(address)) {
-        data.move && (clientsData.get(address).move = data.move);
-        data.isFire && (clientsData.get(address).fire = data.isFire);
-      } else {
-        clientsData.set(address, {
-          move: data.move,
-          fire: data.isFire,
-        });
-      }
-    });
+      tickId = setInterval(() => {
+        updateWorld();
 
-    tickId = setInterval(() => {
-      updateWorld();
+        server.send(
+          jsonHelper.stringifyWithMapDataType({
+            action: "state",
+            state: worldState,
+          }),
+          (error) => {
+            error && console.error(`Error: ${error}`);
+          }
+        );
+      }, tickInterval);
 
-      server.send(
-        jsonHelper.stringifyWithMapDataType({
-          action: "state",
-          state: worldState,
-        }),
-        (error) => {
-          error && console.error(`Error: ${error}`);
-        }
-      );
-    }, tickInterval);
+      roundTimerId = setTimeout(() => {
+        worldState.timeIsOver = true;
+        server.stateTransitionTo("next");
+      }, roundLimitTime);
+    },
 
-    roundTimerId = setTimeout(() => {
-      worldState.timeIsOver = true;
-      server.stateTransitionTo("next");
-    }, roundLimitTime);
-  },
-
-  disposeHandler: () => {
-    server.unbindEndpoint(endpoints.update);
-    clearInterval(tickId);
-    clearTimeout(roundTimerId);
-  },
-});
+    disposeHandler: () => {
+      clearInterval(tickId);
+      clearTimeout(roundTimerId);
+    },
+  };
+};

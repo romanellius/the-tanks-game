@@ -102,7 +102,7 @@ client.on("connect", () => {
         action = "api/states/join";
         break;
       case "t":
-        action = "api/V1/getUser/1";
+        action = "api/test";
         break;
       default:
         return;

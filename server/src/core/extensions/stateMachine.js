@@ -44,10 +44,9 @@ const getStateDataFromFolderStructure = (stateFolders) => {
 };
 
 const getStateDataFromFileStructure = (path) => {
-  const stateFiles = getAllFiles(path);
-
   const stateData = [];
-  for (const file of stateFiles) {
+
+  for (const file of getAllFiles(path)) {
     const { handler, disposeHandler } = require(file.absPath)(server);
 
     stateData.push({

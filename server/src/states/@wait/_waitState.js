@@ -1,10 +1,9 @@
 const endpoints = {
   join: "/join",
   leave: "/leave",
-  test: /^\/api\/v1\/[a-zA-Z0-9]*user[a-zA-Z0-9]*\/?\d*$/i,
 };
 
-// TODO: business logic does not need access to such methods as: run, onRun, etc..
+// TODO: business logic does not need access to such methods as: run, onRun, bindEndpoint and etc..
 module.exports = (server) => {
   const stateRouter = server.getStateRouter();
 
@@ -12,7 +11,7 @@ module.exports = (server) => {
     handler: () => {
       server.clearClients();
 
-      stateRouter.tryBindEndpoint(endpoints.join, (_, remote) => {
+      stateRouter.bindEndpoint(endpoints.join, (_, remote) => {
         server.connectClient(
           remote,
           () =>
@@ -20,17 +19,11 @@ module.exports = (server) => {
         );
       });
 
-      stateRouter.tryBindEndpoint(endpoints.leave, (_, remote) => {
+      stateRouter.bindEndpoint(endpoints.leave, (_, remote) => {
         server.disconnectClient(remote);
       });
-
-      server.tryBindEndpoint(endpoints.test, () =>
-        console.log("TEST ENDPOINT INVOKED")
-      );
     },
 
-    disposeHandler: () => {
-      server.unbindEndpoint(endpoints.test);
-    },
+    disposeHandler: () => {},
   };
 };

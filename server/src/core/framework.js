@@ -1,7 +1,7 @@
 ///Framework: ABSTRACTION and EXTENSIONS Support///
 
 module.exports = (server, extensions) => {
-  const { onRun, run } = server;
+  const { onRun, run, bindEndpoint } = server;
   const { getConfigHandlers, getRuntimeHandlers, getRunHandlers } = extensions;
 
   const serverProps = getRuntimeHandlers();
@@ -17,11 +17,16 @@ module.exports = (server, extensions) => {
   });
 
   return {
+    run,
     onRun: function (callback, isCritical) {
       onRun(callback, isCritical);
       return this;
     },
-    run,
+
+    bindEndpoint: function (route, handler) {
+      bindEndpoint(route, handler);
+      return this;
+    },
     ...props,
   };
 };

@@ -27,7 +27,7 @@ const getMatchingFileAbsPath = (absFolderPath, pattern) => {
   return name && join(absFolderPath, name);
 };
 
-function* getAllFiles(path) {
+function* generatorGetAllFiles(path) {
   const absPath = resolve(path);
   const entries = fs.readdirSync(absPath, {
     withFileTypes: true,
@@ -35,7 +35,7 @@ function* getAllFiles(path) {
 
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      yield* getAllFiles(join(absPath, entry.name));
+      yield* generatorGetAllFiles(join(absPath, entry.name));
     } else {
       yield { ...entry, absPath: join(absPath, entry.name) };
     }
@@ -55,7 +55,7 @@ module.exports = {
 
   getFolders,
   getMatchingFileAbsPath,
-  getAllFiles,
+  getAllFiles: generatorGetAllFiles,
   getFile,
   getFileNameWithNoExtension,
 };

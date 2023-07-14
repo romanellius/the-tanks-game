@@ -1,6 +1,8 @@
 ///ENTRY POINT///
 
 const { resolve } = require("./libs/iocContainer");
+const { toString: flattenAddress } = require("./utils/addressHelper");
+
 const app = resolve("core/framework");
 
 app
@@ -36,12 +38,10 @@ stateRouter.bindEndpoint(/(?:)/, (data, _, next) => {
 app
   .bindEndpoint(undefined, (_, remote) => {
     const server = resolve("core/server/server");
-    server.send(`Hello, ${remote.address}:${remote.port}!`, (error) =>
+    server.send(`Hello, ${flattenAddress(remote)}!`, (error) =>
       error
-        ? console.error(
-            `Error: Message not sent to ${remote.address}:${remote.port}`
-          )
-        : console.log(`Message sent to ${remote.address}:${remote.port}`)
+        ? console.error(`Error: Message not sent to ${flattenAddress(remote)}`)
+        : console.log(`Message sent to ${flattenAddress(remote)}`)
     );
     server.disconnectClient(remote);
   })

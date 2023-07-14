@@ -1,5 +1,7 @@
 ///CLIENTS Handling///
 
+const { toString: flattenAddress } = require("../../utils/addressHelper");
+
 module.exports = () => {
   const connectedClients = new Map();
 
@@ -8,24 +10,14 @@ module.exports = () => {
   const getValues = () => connectedClients.values();
   const addClient = (remote, callback) => {
     connectedClients.size < 2 &&
-      connectedClients.set(
-        // FIXME: remove with concatenation?
-        JSON.stringify({
-          ip: remote.address.toString(),
-          port: remote.port,
-        }),
-        { address: { ip: remote.address.toString(), port: remote.port } }
-      );
+      connectedClients.set(flattenAddress(remote), {
+        address: { ip: remote.address.toString(), port: remote.port },
+      });
 
     callback && callback();
   };
   const removeClient = (remote, callback) => {
-    connectedClients.delete(
-      JSON.stringify({
-        ip: remote.address.toString(),
-        port: remote.port,
-      })
-    );
+    connectedClients.delete(flattenAddress(remote));
 
     callback && callback();
   };

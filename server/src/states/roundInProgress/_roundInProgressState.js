@@ -1,5 +1,6 @@
 //TODO: replace with resolve()
 const jsonHelper = require("../../utils/jsonHelper");
+const { toString: flattenAddress } = require("../../utils/addressHelper");
 
 let worldState;
 
@@ -194,11 +195,7 @@ module.exports = (server) => {
       worldState = global._worldState;
 
       stateRouter.bindEndpoint(endpoints.update, (data, remote) => {
-        //FIXME: remove with concatenation?
-        const address = JSON.stringify({
-          ip: remote.address.toString(),
-          port: remote.port,
-        });
+        const address = flattenAddress(remote);
 
         if (clientsData.has(address)) {
           data.move && (clientsData.get(address).move = data.move);

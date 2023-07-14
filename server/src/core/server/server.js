@@ -33,10 +33,10 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
   const onMessageReceived = (buffer, remote) => {
     /*buffer.length > mtuRecommendedSize
           ? console.warn(
-            `${remote.address.toString()}:${remote.port}> ${mtuSizeWarning}`
+            `${flattenAddress(remote)}> ${mtuSizeWarning}`
           )
           : console.log(
-            `${remote.address.toString()}:${remote.port}> ${buffer.toString()}`
+            `${flattenAddress(remote)}> ${buffer.toString()}`
           );*/
 
     try {

@@ -1,15 +1,12 @@
 ///Message ROUTING///
 
-//TODO: replace with resolve()
-const { isRegExp: isRoutePatternDynamic } = require("../../utils/regexpHelper");
-
 //TODO: "Error Handling" for Endpoints and States:
 //        next(!undefined and !"router") - skip routes/routers while "error handling" middleware is found
 //        default and user-defined error handlers
 //        try ... catch each routeHandler calling and call next(error) on exception
 //        define error-handlers middleware LAST
 
-module.exports = (rootPattern) => {
+module.exports = (isRoutePatternDynamic, rootPattern) => {
   //init
   const routes = [];
 
@@ -20,7 +17,7 @@ module.exports = (rootPattern) => {
     if (
       !pattern ||
       pattern === "" ||
-      (isRoutePatternDynamic &&
+      (isRoutePatternDynamic(pattern) &&
         (pattern.source === /()/.source || pattern.source === /(?:)/.source))
     ) {
       pattern = isRootPattern ? /^\// : /\//;

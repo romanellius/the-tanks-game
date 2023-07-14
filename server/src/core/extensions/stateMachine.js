@@ -10,6 +10,7 @@ const {
 
 const { resolve } = require("../../libs/iocContainer");
 const server = resolve("core/server/server");
+const frameworkInterface = resolve("core/frameworkInterface");
 
 //init
 const states = {};
@@ -36,7 +37,8 @@ const getStateDataFromFolderStructure = (stateFolders) => {
   return stateFolders.reduce((stateData, { name, absPath }) => {
     const fileAbsPath = getMatchingFileAbsPath(absPath, stateFilePattern);
     if (fileAbsPath) {
-      const { handler, disposeHandler } = require(fileAbsPath)(server);
+      const { handler, disposeHandler } =
+        require(fileAbsPath)(frameworkInterface);
       stateData.push({
         name,
         handler,
@@ -52,7 +54,9 @@ const getStateDataFromFileStructure = (path) => {
   const stateData = [];
 
   for (const file of getAllFiles(path)) {
-    const { handler, disposeHandler } = require(file.absPath)(server);
+    const { handler, disposeHandler } = require(file.absPath)(
+      frameworkInterface
+    );
 
     stateData.push({
       name: getFileNameWithNoExtension(file.name),
@@ -127,7 +131,7 @@ const registerStateRouter = (path) => {
 
 const bindServerProps = () => {
   for (const propName in runtimeServerProps) {
-    server[propName] = runtimeServerProps[propName];
+    frameworkInterface[propName] = runtimeServerProps[propName];
   }
 };
 

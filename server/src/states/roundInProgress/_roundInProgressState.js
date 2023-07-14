@@ -218,10 +218,7 @@ module.exports = (server) => {
           jsonHelper.stringifyWithMapDataType({
             action: "state",
             state: worldState,
-          }),
-          (error) => {
-            error && console.error(`Error: ${error}`);
-          }
+          })
         );
       }, tickInterval);
 

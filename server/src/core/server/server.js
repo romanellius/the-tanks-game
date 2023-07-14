@@ -77,7 +77,11 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
   //"socket.send" OVERRIDDEN
   const sendMessage = (message, callback) => {
     for (const { address } of clients.getAll()) {
-      socket.send(message, address.port, address.ip, callback);
+      socket.send(message, address.port, address.ip, (error) => {
+        callback();
+
+        error && socket.terminate();
+      });
     }
   };
 
@@ -86,12 +90,14 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
 
   const run = () => {
     socket
+      .onReceive(onMessageReceived)
       .onRun(() =>
         callbacks.onRun.invoke({
           address: socketConfig,
         })
       )
-      .onReceive(onMessageReceived)
+      .onError()
+      .onTerminate()
       .run(socketConfig);
   };
   const onRun = (callback, isCritical = false) =>

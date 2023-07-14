@@ -67,10 +67,7 @@ module.exports = (server) => ({
       jsonHelper.stringifyWithMapDataType({
         action: "roundOnRun",
         state: global._worldState,
-      }),
-      (error) => {
-        error && console.error(`Error: ${error}`);
-      }
+      })
     );
 
     setTimeout(() => {

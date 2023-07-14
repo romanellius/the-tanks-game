@@ -28,7 +28,7 @@ module.exports = ({ type: socketType }) => {
   };
   const onError = function (callback) {
     udpSocket.on("error", (error) => {
-      callback ? callback(error) : console.error(`Error: ${error}`);
+      callback ? callback(error) : console.error(String(error));
       udpSocket.close();
     });
     return this;
@@ -38,7 +38,9 @@ module.exports = ({ type: socketType }) => {
     udpSocket.close();
   };
   const onTerminate = function (callback) {
-    udpSocket.on("close", callback ? callback() : console.warn("Closed"));
+    udpSocket.on("close", () =>
+      callback ? callback() : console.warn("Server stopped")
+    );
     return this;
   };
 
@@ -48,8 +50,8 @@ module.exports = ({ type: socketType }) => {
     onReceive,
     run,
     onRun,
-    //onError,
+    onError,
     terminate,
-    //onTerminate,
+    onTerminate,
   };
 };

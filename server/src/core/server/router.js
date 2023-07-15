@@ -4,7 +4,7 @@
 //        next(!undefined and !"router") - skip routes/routers while "error handling" middleware is found
 //        default and user-defined error handlers
 //        try ... catch each routeHandler calling and call next(error) on exception
-//        define error-handlers middleware LAST
+//        define error-handlers middleware LAST or separate method for error-handling
 
 module.exports = (isRoutePatternDynamic, rootPattern) => {
   //init

@@ -203,14 +203,11 @@ const run = (state) => {
 };
 
 module.exports = {
-  configHandlers: [
-    {
-      name: "useStateMachine",
-      func: function (routerPattern) {
-        build(routerPattern);
-        return this;
-      },
+  config: {
+    useStateMachine: function (routerPattern) {
+      build(routerPattern);
+      return this;
     },
-  ],
+  },
   run: () => initState && run(initState),
 };

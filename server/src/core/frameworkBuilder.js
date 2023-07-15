@@ -4,12 +4,10 @@ module.exports = (server, extensions, makeChainable) => {
   const { onRun, run, bindEndpoint, bindRouter } = server;
   const { getConfigHandlers, getRunHandlers } = extensions;
 
-  const props = getConfigHandlers();
   const runHandlers = getRunHandlers();
+  onRun(runHandlers);
 
-  runHandlers.forEach((runHandler) => {
-    onRun(runHandler);
-  });
+  const props = getConfigHandlers();
 
   return {
     run,

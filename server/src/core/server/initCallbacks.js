@@ -18,6 +18,9 @@ module.exports = () => {
           ? callbacks.onRun.unshift(callback)
           : callbacks.onRun.push(callback);
       },
+      addAll: (initCallbacks) => {
+        initCallbacks.forEach((callback) => callbacks.onRun.push(callback));
+      },
       /*const addTick = (interval, handler) => {
       callbacks.ticks.push({ interval, handler });
     },*/

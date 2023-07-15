@@ -48,7 +48,6 @@ const generateWorld = (server) => {
   ]);
 
   //TODO: replace global with useContext like in React or xstate.js.org/docs/guides/context.html#initial-context
-
   global._worldState = {
     round: roundNumber++ % 3,
     map,

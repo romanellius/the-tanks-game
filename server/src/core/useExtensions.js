@@ -7,12 +7,9 @@ const bindExtensions = () => {
   const runHandlers = [];
 
   for (const file of getAllFiles("src/core/extensions")) {
-    const { configHandlers, run: runHandler } = require(file.absPath);
+    const { config: configHandlers, run: runHandler } = require(file.absPath);
 
-    configHandlers.forEach((handler) => {
-      allConfigHandlers[handler.name] = handler.func;
-    });
-
+    Object.assign(allConfigHandlers, configHandlers);
     runHandlers.push(runHandler);
   }
 

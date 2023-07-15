@@ -79,7 +79,7 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
   const sendMessage = (message, callback) => {
     for (const { address } of clients.getAll()) {
       socket.send(message, address.port, address.ip, (error) => {
-        callback && callback();
+        callback && callback(error);
 
         error && socket.terminate();
       });
@@ -102,8 +102,10 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
       .onTerminate()
       .run(socketConfig);
   };
-  const onRun = (callback, isCritical = false) =>
-    callbacks.onRun.add(callback, isCritical);
+  const onRun = (callback, isCritical) =>
+    callback instanceof Array
+      ? callbacks.onRun.addAll(callback)
+      : callbacks.onRun.add(callback, isCritical);
 
   //"rootPattern" must start with ["/](static pattern) or [/^\/](RegExp pattern)
   const bindRouter = (rootPattern) => {

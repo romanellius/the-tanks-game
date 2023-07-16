@@ -2,7 +2,13 @@
 
 const { resolve } = require("../../libs/iocContainer");
 
-module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
+module.exports = (
+  socket,
+  clients,
+  defaultRouter,
+  initCallbacks,
+  socketConfig
+) => {
   //init
   const routers = [defaultRouter];
 
@@ -94,7 +100,7 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
     socket
       .onReceive(onMessageReceived)
       .onRun(() =>
-        callbacks.onRun.invoke({
+        initCallbacks.onRun.invoke({
           address: socketConfig,
         })
       )
@@ -102,10 +108,9 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
       .onTerminate()
       .run(socketConfig);
   };
-  const onRun = (callback, isCritical) =>
-    callback instanceof Array
-      ? callbacks.onRun.addAll(callback)
-      : callbacks.onRun.add(callback, isCritical);
+  const onRun = (callback) => initCallbacks.onRun.add(callback);
+  const onRunExtensions = (callbacks) =>
+    initCallbacks.onRun.addExtensions(callbacks);
 
   //"rootPattern" must start with ["/](static pattern) or [/^\/](RegExp pattern)
   const bindRouter = (rootPattern) => {
@@ -134,5 +139,6 @@ module.exports = (socket, clients, defaultRouter, callbacks, socketConfig) => {
 
     run,
     onRun,
+    onRunExtensions,
   };
 };

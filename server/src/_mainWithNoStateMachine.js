@@ -9,7 +9,7 @@ app
   .onRun(({ address }) => {
     const { ip, port, type } = address;
     console.log(`Server running on ${ip}:${port} (${type})\n`);
-  }, true)
+  })
   //invokes on J,T
   .bindEndpoint("", (data, remote, next) => {
     console.log(`Root logger: ${data?.action}`);

@@ -1,29 +1,31 @@
 ///CALLBACKS Handling///
 
 module.exports = () => {
-  const callbacks = {
-    onRun: [],
+  const allCallbacks = {
+    onRun: { main: [], extensions: [] },
     /*ticks: [],*/
   };
 
   return {
     onRun: {
-      invoke: (config) =>
-        callbacks.onRun.forEach((callback) => callback(config)),
-      /*callbacks.ticks.forEach(({ interval, handler }) =>
-      setInterval(handler, interval)
-    );*/
-      add: (callback, isCritical) => {
-        isCritical
-          ? callbacks.onRun.unshift(callback)
-          : callbacks.onRun.push(callback);
+      invoke: (config) => {
+        const { main, extensions } = allCallbacks.onRun;
+        main.concat(extensions).forEach((callback) => callback(config));
       },
-      addAll: (initCallbacks) => {
-        initCallbacks.forEach((callback) => callbacks.onRun.push(callback));
+      /*callbacks.ticks.forEach(({ interval, handler }) =>
+        setInterval(handler, interval)
+      );*/
+      add: (callback) => {
+        allCallbacks.onRun.main.push(callback);
+      },
+      addExtensions: (callbacks) => {
+        callbacks.forEach((callback) =>
+          allCallbacks.onRun.extensions.push(callback)
+        );
       },
       /*const addTick = (interval, handler) => {
-      callbacks.ticks.push({ interval, handler });
-    },*/
+        callbacks.ticks.push({ interval, handler });
+      },*/
     },
   };
 };

@@ -7,7 +7,7 @@ app
   .onRun(({ address }) => {
     const { ip, port, type } = address;
     console.log(`Server running on ${ip}:${port} (${type})\n`);
-  }, true)
+  })
   .useStateMachine(/^\/api/)
   .bindEndpoint(/^\//, (data, _, next) => {
     console.log(`Logger: ${data?.action}`);

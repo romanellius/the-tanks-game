@@ -69,6 +69,13 @@ module.exports = (isRoutePatternDynamic, rootPattern) => {
     }
   }
 
+  const resolveHandlers = (path) => {
+    const relPath = getRelativePath(path, rootPattern);
+    if (!relPath) return genGetRouteHandlers([]);
+
+    return genGetRouteHandlers(routes, relPath);
+  };
+
   //public functions
   const bind = (pattern, handler) => {
     if (typeof handler !== "function") {
@@ -78,21 +85,32 @@ module.exports = (isRoutePatternDynamic, rootPattern) => {
     pattern = normalizePattern(pattern);
     routes.push({ pattern, handler });
   };
-
   const unbindAll = () => {
     routes.length = 0;
   };
+  const invoke = (data, remote) => {
+    const genHandlers = resolveHandlers(data?.action);
 
-  const resolveHandlers = (path) => {
-    const relPath = getRelativePath(path, rootPattern);
-    if (!relPath) return genGetRouteHandlers([]);
+    let resolvedCount = 0;
+    const invokeNextHandler = (doSkip = false) => {
+      const handlerResult = genHandlers.next();
 
-    return genGetRouteHandlers(routes, relPath);
+      const doInvokeNextHandler = !doSkip && !handlerResult.done;
+      if (doInvokeNextHandler) {
+        const handler = handlerResult.value;
+        handler(data, remote, invokeNextHandler);
+
+        resolvedCount++;
+      }
+    };
+    invokeNextHandler();
+
+    return resolvedCount > 0;
   };
 
   return {
     bind,
     unbindAll,
-    resolveHandlers,
+    invoke,
   };
 };

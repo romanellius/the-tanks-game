@@ -16,26 +16,6 @@ module.exports = (
   const bindEndpointToRouter = (router, route, handler) =>
     router.bind(route, handler);
 
-  const invokeRoutes = (router, data, remote) => {
-    const genRouterHandlers = router.resolveHandlers(data?.action);
-
-    let resolvedCount = 0;
-    const invokeNextRouteHandler = (doSkipRouter = false) => {
-      const routerHandlerResult = genRouterHandlers.next();
-
-      const doInvokeNextRoute = !doSkipRouter && !routerHandlerResult.done;
-      if (doInvokeNextRoute) {
-        const handler = routerHandlerResult.value;
-        handler(data, remote, invokeNextRouteHandler);
-
-        resolvedCount++;
-      }
-    };
-    invokeNextRouteHandler();
-
-    return resolvedCount > 0;
-  };
-
   const onMessageReceived = (buffer, remote) => {
     /*buffer.length > mtuRecommendedSize
           ? console.warn(
@@ -52,7 +32,7 @@ module.exports = (
         !data?.action ||
         !routers.reduce(
           (isPathResolved, router) =>
-            invokeRoutes(router, data, remote) || isPathResolved,
+            router.invoke(data, remote) || isPathResolved,
           false
         )
       ) {

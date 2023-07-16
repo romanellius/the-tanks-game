@@ -92,6 +92,17 @@ module.exports = (
     }
   };
 
+  //"rootPattern" must start with ["/](static pattern) or [/^\/](RegExp pattern)
+  const bindRouter = (rootPattern) => {
+    const newRouter = resolve("core/server/router", rootPattern);
+    routers.push(newRouter);
+
+    return {
+      bindEndpoint: (route, handler) =>
+        bindEndpointToRouter(newRouter, route, handler),
+      unbindAllEndpoints: () => newRouter.unbindAll(),
+    };
+  };
   //"route" must start with ["/](static pattern) or [/\/](RegExp pattern)
   const bindEndpoint = (route, handler) =>
     bindEndpointToRouter(defaultRouter, route, handler);
@@ -111,18 +122,6 @@ module.exports = (
   const onRun = (callback) => initCallbacks.onRun.add(callback);
   const onRunExtensions = (callbacks) =>
     initCallbacks.onRun.addExtensions(callbacks);
-
-  //"rootPattern" must start with ["/](static pattern) or [/^\/](RegExp pattern)
-  const bindRouter = (rootPattern) => {
-    const newRouter = resolve("core/server/router", rootPattern);
-    routers.push(newRouter);
-
-    return {
-      bindEndpoint: (route, handler) =>
-        bindEndpointToRouter(newRouter, route, handler),
-      unbindAllEndpoints: () => newRouter.unbindAll(),
-    };
-  };
 
   return {
     getClientIds: clients.getAllIds,

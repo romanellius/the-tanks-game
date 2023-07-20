@@ -1,4 +1,4 @@
-const roundEndDelay = 3_000;
+const roundEndDelay = 1_000; //3_000;
 
 module.exports = (server) => ({
   handler: () => {

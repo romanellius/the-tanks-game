@@ -157,7 +157,7 @@ const bindStateHandlers = (stateData) => {
   });
 };
 
-//public functions
+//main functions
 const build = (routerPattern = /^\/api/) => {
   if (Object.keys(states).length) {
     throw "StateMachine: State machine already has been built";

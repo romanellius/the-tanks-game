@@ -1,7 +1,7 @@
 const jsonHelper = require("../../utils/jsonHelper");
 
 let roundNumber = 0;
-const roundStartDelay = 3_000;
+const roundStartDelay = 1_000; //3_000;
 
 const generateWorld = (server) => {
   const playerAddresses = server.getClientIds();

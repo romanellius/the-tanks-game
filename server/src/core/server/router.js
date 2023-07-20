@@ -1,7 +1,5 @@
 ///Message ROUTING///
 
-//TODO: "Error Handling" for States ==> basic try-catch inside of the StateMachine extension
-
 module.exports = (isRoutePatternDynamic, pattern) => {
   //init
   const routes = [],
@@ -32,6 +30,7 @@ module.exports = (isRoutePatternDynamic, pattern) => {
     if (isRoutePatternDynamic(rootPattern)) {
       const matches = rootPattern.exec(path);
       if (matches) {
+        //FIXME: enumerate all matches
         matchLength = matches[0].length;
       }
     } else {

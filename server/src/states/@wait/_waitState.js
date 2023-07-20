@@ -4,10 +4,8 @@ const endpoints = {
 };
 
 module.exports = (server) => {
-  const stateRouter = server.getStateRouter();
-
   return {
-    handler: () => {
+    handler: (stateRouter) => {
       server.clearClients();
 
       stateRouter.bindEndpoint(endpoints.join, (_, remote) => {

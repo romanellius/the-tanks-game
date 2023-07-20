@@ -188,7 +188,7 @@ const transitionTo = (nextInput) => {
     "State Machine:",
     `"${currState}"${currState === "gameEnd" ? "\n" : ""}`
   );
-  states[currState].handler();
+  states[currState].handler(runtimeServerProps.getStateRouter());
 
   return true;
 };
@@ -202,7 +202,7 @@ const run = (state) => {
 
   currState = state;
   console.log("State Machine:", `"${currState}"`);
-  states[currState].handler();
+  states[currState].handler(runtimeServerProps.getStateRouter());
 };
 
 module.exports = {

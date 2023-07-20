@@ -187,10 +187,8 @@ const endpoints = {
 };
 
 module.exports = (server) => {
-  const stateRouter = server.getStateRouter();
-
   return {
-    handler: () => {
+    handler: (stateRouter) => {
       worldState = global._worldState;
 
       stateRouter.bindEndpoint(endpoints.update, (data, remote) => {

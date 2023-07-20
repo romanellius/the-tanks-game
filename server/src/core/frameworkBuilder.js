@@ -1,6 +1,10 @@
 ///Framework: ABSTRACT BUILDER and EXTENSIONS Support///
 
-module.exports = (server, extensions, makeChainable) => {
+module.exports = (
+  server,
+  extensions,
+  { makeChainable, wrapWithErrorHandler }
+) => {
   const {
     onRunExtensions,
     onRun,
@@ -10,23 +14,40 @@ module.exports = (server, extensions, makeChainable) => {
     addErrorHandler,
   } = server;
 
+  const bindRunHandlers = (runHandlers, onRun) => {
+    wrapWithErrorHandler(runHandlers, (error) => {
+      throw `Run: Extension can not be started: ${error}`;
+    });
+    onRun(runHandlers);
+  };
+
+  const bindConfigHandlers = (target, configHandlers) => {
+    wrapWithErrorHandler(configHandlers, (error) => {
+      throw `Build: Extension can not be configured: ${error}`;
+    });
+    makeChainable(configHandlers);
+
+    Object.assign(target, configHandlers);
+  };
+
   return {
     build: (doSupportExtensions = true) => {
-      let props = {};
+      const props = { onRun, bindEndpoint, addErrorHandler };
+      makeChainable(props);
 
       if (doSupportExtensions) {
         const { getRunHandlers, getConfigHandlers } = extensions;
 
         const runHandlers = getRunHandlers();
-        onRunExtensions(runHandlers);
+        const configHandlers = getConfigHandlers();
 
-        props = getConfigHandlers();
+        bindRunHandlers(runHandlers, onRunExtensions);
+        bindConfigHandlers(props, configHandlers);
       }
 
       return {
         run,
         bindRouter,
-        ...makeChainable({ onRun, bindEndpoint, addErrorHandler }),
 
         ...props,
       };

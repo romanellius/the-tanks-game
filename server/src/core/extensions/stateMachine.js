@@ -21,14 +21,20 @@ let currState;
 let stateRouter;
 
 const runtimeServerProps = {
-  stateTransitionTo: (nextInput) => isRun() && transitionTo(nextInput),
-  getStateRouter: () => {
-    const { bindEndpoint, addErrorHandler } = stateRouter;
-    return { bindEndpoint, addErrorHandler };
-  },
+  getStateRouter: () => getRouterInterface(stateRouter),
+  stateTransitionTo: safeTransitionTo,
 };
 
 //private functions
+function getRouterInterface(router) {
+  const { bindEndpoint, addErrorHandler } = router;
+  return { bindEndpoint, addErrorHandler };
+}
+
+function safeTransitionTo(nextInput) {
+  isRun() && transitionTo(nextInput);
+}
+
 const getStateConfig = () => {
   const stateConfigJson = getFile("./src/stateConfig.json");
   return JSON.parse(stateConfigJson);
@@ -157,6 +163,23 @@ const bindStateHandlers = (stateData) => {
   });
 };
 
+const invokeHandler = (state) => {
+  const stateRouterInterface = getRouterInterface(stateRouter);
+  try {
+    states[state].handler(stateRouterInterface);
+  } catch (error) {
+    throw `StateMachine: "${state}" handler can not be proceed: ${error}`;
+  }
+};
+
+const invokeDisposeHandler = (state) => {
+  try {
+    states[state].disposeHandler && states[state].disposeHandler();
+  } catch (error) {
+    throw `StateMachine: "${state}" dispose handler can not be proceed: ${error}`;
+  }
+};
+
 //main functions
 const build = (routerPattern = /^\/api/) => {
   if (Object.keys(states).length) {
@@ -180,16 +203,15 @@ const transitionTo = (nextInput) => {
   }
 
   stateRouter.reset();
+  invokeDisposeHandler(currState);
 
-  states[currState].disposeHandler && states[currState].disposeHandler();
   currState = states[currState].conditions[nextInput];
-
   console.log(
     "State Machine:",
     `"${currState}"${currState === "gameEnd" ? "\n" : ""}`
   );
-  states[currState].handler(runtimeServerProps.getStateRouter());
 
+  invokeHandler(currState);
   return true;
 };
 
@@ -202,15 +224,12 @@ const run = (state) => {
 
   currState = state;
   console.log("State Machine:", `"${currState}"`);
-  states[currState].handler(runtimeServerProps.getStateRouter());
+  invokeHandler(currState);
 };
 
 module.exports = {
   config: {
-    useStateMachine: function (routerPattern) {
-      build(routerPattern);
-      return this;
-    },
+    useStateMachine: build,
   },
   run: () => initState && run(initState),
 };

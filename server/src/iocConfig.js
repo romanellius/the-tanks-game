@@ -9,12 +9,12 @@ module.exports = {
   },
   "core/frameworkBuilder": {
     path: "./src/core/frameworkBuilder",
-    handler: (path, server, extensions, makeChainable) =>
-      require(path)(server, extensions, makeChainable),
+    handler: (path, server, extensions, functionHelper) =>
+      require(path)(server, extensions, functionHelper),
     dependencies: [
       "core/server/server",
       "core/useExtensions",
-      "helpers/makeFunctionChainable",
+      "helpers/functionHelper",
     ],
     // isSingleton: true,
   },
@@ -32,7 +32,7 @@ module.exports = {
       clients,
       router,
       callbacks,
-      makeChainable,
+      functionHelper,
       config
     ) =>
       require(path)(
@@ -40,7 +40,7 @@ module.exports = {
         clients,
         router,
         callbacks,
-        makeChainable,
+        functionHelper,
         config
       ),
     dependencies: [
@@ -48,7 +48,7 @@ module.exports = {
       "core/server/clients",
       "core/server/router",
       "core/server/initCallbacks",
-      "helpers/makeFunctionChainable",
+      "helpers/functionHelper",
       "config",
     ],
     isSingleton: true,
@@ -89,9 +89,13 @@ module.exports = {
     path: "./src/utils/addressHelper",
     handler: (path) => require(path).toString,
   },
-  "helpers/makeFunctionChainable": {
+  "helpers/functionHelper": {
     path: "./src/utils/functionHelper",
-    handler: (path) => require(path).makeChainable,
+    handler: (path) => require(path),
+  },
+  "helpers/stringifyWithMap": {
+    path: "./src/utils/jsonHelper",
+    handler: (path) => require(path).stringifyWithMapDataType,
   },
   "helpers/isRoutePatternDynamic": {
     path: "./src/utils/regexpHelper",

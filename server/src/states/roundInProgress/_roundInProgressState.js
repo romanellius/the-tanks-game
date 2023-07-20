@@ -1,5 +1,6 @@
-const jsonHelper = require("../../utils/jsonHelper");
-const { toString: flattenAddress } = require("../../utils/addressHelper");
+const { resolve } = require("../../libs/iocContainer");
+const stringifyWithMapDataType = resolve("helpers/stringifyWithMap");
+const flattenAddress = resolve("helpers/flattenAddress");
 
 let worldState;
 
@@ -209,7 +210,7 @@ module.exports = (server) => {
         updateWorld();
 
         server.send(
-          jsonHelper.stringifyWithMapDataType({
+          stringifyWithMapDataType({
             action: "state",
             state: worldState,
           })

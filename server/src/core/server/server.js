@@ -7,7 +7,7 @@ module.exports = (
   clients,
   defaultRouter,
   initCallbacks,
-  makeChainable,
+  { makeChainable },
   socketConfig
 ) => {
   //init

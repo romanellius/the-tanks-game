@@ -1,4 +1,5 @@
-const jsonHelper = require("../../utils/jsonHelper");
+const { resolve } = require("../../libs/iocContainer");
+const stringifyWithMapDataType = resolve("helpers/stringifyWithMap");
 
 let roundNumber = 0;
 const roundStartDelay = 1_000; //3_000;
@@ -62,7 +63,7 @@ module.exports = (server) => ({
     generateWorld(server);
 
     server.send(
-      jsonHelper.stringifyWithMapDataType({
+      stringifyWithMapDataType({
         action: "roundOnRun",
         state: global._worldState,
       })

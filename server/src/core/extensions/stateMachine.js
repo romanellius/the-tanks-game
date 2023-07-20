@@ -8,7 +8,9 @@ const {
   getFileNameWithNoExtension,
 } = require("../../libs/fileHelper");
 
-const { resolve } = require("../../libs/iocContainer");
+const iocContainer = require("../../libs/iocContainer");
+const { resolve } = iocContainer;
+
 const server = resolve("core/server/server");
 const frameworkInterface = resolve("core/frameworkInterface");
 
@@ -46,8 +48,10 @@ const getStateDataFromFolderStructure = (stateFolders) => {
   return stateFolders.reduce((stateData, { name, absPath }) => {
     const fileAbsPath = getMatchingFileAbsPath(absPath, stateFilePattern);
     if (fileAbsPath) {
-      const { handler, disposeHandler } =
-        require(fileAbsPath)(frameworkInterface);
+      const { handler, disposeHandler } = require(fileAbsPath)(
+        frameworkInterface,
+        iocContainer
+      );
       stateData.push({
         name,
         handler,
@@ -64,7 +68,8 @@ const getStateDataFromFileStructure = (path) => {
 
   for (const file of getAllFiles(path)) {
     const { handler, disposeHandler } = require(file.absPath)(
-      frameworkInterface
+      frameworkInterface,
+      iocContainer
     );
 
     stateData.push({

@@ -1,6 +1,3 @@
-const { resolve } = require("../../libs/iocContainer");
-const stringifyWithMapDataType = resolve("helpers/stringifyWithMap");
-
 let roundNumber = 0;
 const roundStartDelay = 1_000; //3_000;
 
@@ -58,19 +55,23 @@ const generateWorld = (server) => {
   };
 };
 
-module.exports = (server) => ({
-  handler: () => {
-    generateWorld(server);
+module.exports = (server, { resolve }) => {
+  const stringifyWithMapDataType = resolve("helpers/stringifyWithMap");
 
-    server.send(
-      stringifyWithMapDataType({
-        action: "roundOnRun",
-        state: global._worldState,
-      })
-    );
+  return {
+    handler: () => {
+      generateWorld(server);
 
-    setTimeout(() => {
-      server.stateTransitionTo("next");
-    }, roundStartDelay);
-  },
-});
+      server.send(
+        stringifyWithMapDataType({
+          action: "roundOnRun",
+          state: global._worldState,
+        })
+      );
+
+      setTimeout(() => {
+        server.stateTransitionTo("next");
+      }, roundStartDelay);
+    },
+  };
+};

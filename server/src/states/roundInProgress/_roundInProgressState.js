@@ -1,7 +1,3 @@
-const { resolve } = require("../../libs/iocContainer");
-const stringifyWithMapDataType = resolve("helpers/stringifyWithMap");
-const flattenAddress = resolve("helpers/flattenAddress");
-
 let worldState;
 
 const tickRate = 1;
@@ -187,7 +183,10 @@ const endpoints = {
   update: "/update",
 };
 
-module.exports = (server) => {
+module.exports = (server, { resolve }) => {
+  const flattenAddress = resolve("helpers/flattenAddress");
+  const stringifyWithMapDataType = resolve("helpers/stringifyWithMap");
+
   return {
     handler: (stateRouter) => {
       worldState = global._worldState;

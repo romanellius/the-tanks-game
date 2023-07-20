@@ -1,7 +1,9 @@
 ///ENTRY POINT///
 
 const { resolve } = require("./libs/iocContainer");
-const app = resolve("core/frameworkBuilder");
+
+const appBuilder = resolve("core/frameworkBuilder");
+const app = appBuilder.build();
 
 app
   .onRun(({ address }) => {

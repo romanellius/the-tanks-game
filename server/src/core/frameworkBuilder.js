@@ -9,18 +9,27 @@ module.exports = (server, extensions, makeChainable) => {
     bindRouter,
     addErrorHandler,
   } = server;
-  const { getConfigHandlers, getRunHandlers } = extensions;
-
-  const runHandlers = getRunHandlers();
-  onRunExtensions(runHandlers);
-
-  const props = getConfigHandlers();
 
   return {
-    run,
-    bindRouter,
-    ...makeChainable({ onRun, bindEndpoint, addErrorHandler }),
+    build: (doSupportExtensions = true) => {
+      let props = {};
 
-    ...props,
+      if (doSupportExtensions) {
+        const { getRunHandlers, getConfigHandlers } = extensions;
+
+        const runHandlers = getRunHandlers();
+        onRunExtensions(runHandlers);
+
+        props = getConfigHandlers();
+      }
+
+      return {
+        run,
+        bindRouter,
+        ...makeChainable({ onRun, bindEndpoint, addErrorHandler }),
+
+        ...props,
+      };
+    },
   };
 };

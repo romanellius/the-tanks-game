@@ -1,7 +1,14 @@
 ///Framework: ABSTRACT BUILDER and EXTENSIONS Support///
 
 module.exports = (server, extensions, makeChainable) => {
-  const { onRunExtensions, onRun, run, bindEndpoint, bindRouter } = server;
+  const {
+    onRunExtensions,
+    onRun,
+    run,
+    bindEndpoint,
+    bindRouter,
+    addErrorHandler,
+  } = server;
   const { getConfigHandlers, getRunHandlers } = extensions;
 
   const runHandlers = getRunHandlers();
@@ -12,7 +19,7 @@ module.exports = (server, extensions, makeChainable) => {
   return {
     run,
     bindRouter,
-    ...makeChainable({ onRun, bindEndpoint }),
+    ...makeChainable({ onRun, bindEndpoint, addErrorHandler }),
 
     ...props,
   };

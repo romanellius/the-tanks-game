@@ -22,7 +22,10 @@ let stateRouter;
 
 const runtimeServerProps = {
   stateTransitionTo: (nextInput) => isRun() && transitionTo(nextInput),
-  getStateRouter: () => stateRouter,
+  getStateRouter: () => {
+    const { bindEndpoint, addErrorHandler } = stateRouter;
+    return { bindEndpoint, addErrorHandler };
+  },
 };
 
 //private functions
@@ -155,7 +158,7 @@ const bindStateHandlers = (stateData) => {
 };
 
 //public functions
-const build = (routerPattern = /^\/api\/states/) => {
+const build = (routerPattern = /^\/api/) => {
   if (Object.keys(states).length) {
     throw "StateMachine: State machine already has been built";
   }
@@ -176,7 +179,7 @@ const transitionTo = (nextInput) => {
     return false;
   }
 
-  stateRouter.unbindAllEndpoints();
+  stateRouter.reset();
 
   states[currState].disposeHandler && states[currState].disposeHandler();
   currState = states[currState].conditions[nextInput];

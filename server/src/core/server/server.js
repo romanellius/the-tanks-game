@@ -7,16 +7,20 @@ module.exports = (
   clients,
   defaultRouter,
   initCallbacks,
+  makeChainable,
   socketConfig
 ) => {
   //init
   const routers = [defaultRouter];
 
   //private functions
-  const bindEndpointToRouter = (router, route, handler) =>
-    router.bind(route, handler);
+  const setDefaultErrorHandler = (router) => {
+    router.onError((error, data) => {
+      console.error(`Error: Route ${data?.action} throws error: ${error}`);
+    });
+  };
 
-  const onMessageReceived = (buffer, remote) => {
+  const deserializeMessage = (buffer) => {
     /*buffer.length > mtuRecommendedSize
           ? console.warn(
             `${flattenAddress(remote)}> ${mtuSizeWarning}`
@@ -27,37 +31,64 @@ module.exports = (
 
     try {
       const data = JSON.parse(buffer.toString());
-
-      if (
-        !data?.action ||
-        !routers.reduce(
-          (isPathResolved, router) =>
-            router.invoke(data, remote) || isPathResolved,
-          false
-        )
-      ) {
-        throw `Router: Can not get route "${data?.action}": does not exist`;
-      }
+      if (!data?.action) throw `Router: Can not handle empty route`;
+      return data;
     } catch (error) {
       console.error(`Error: ${error}`);
-
-      socket.send(
-        `"${buffer.toString()}" is not a valid format of data`,
-        remote.port,
-        remote.address.toString(),
-        (error) => {
-          if (error) {
-            return socket.terminate();
-          }
-
-          console.log(
-            `< "${buffer.toString().substring(0, 32)}${
-              buffer.toString().length > 32 ? "..." : ""
-            }" is not a valid format`
-          );
-        }
-      );
     }
+  };
+
+  const replyMessageNotValid = (socket, buffer, remote) => {
+    socket.send(
+      `"${buffer.toString()}" is not a valid format of data`,
+      remote.port,
+      remote.address.toString(),
+      (error) => {
+        if (error) {
+          return socket.terminate();
+        }
+
+        console.log(
+          `< "${buffer.toString().substring(0, 32)}${
+            buffer.toString().length > 32 ? "..." : ""
+          }" is not a valid format`
+        );
+      }
+    );
+  };
+
+  const resolveMessage = (buffer, remote) => {
+    const data = deserializeMessage(buffer);
+    if (!data) return replyMessageNotValid(socket, buffer, remote);
+
+    for (const router of routers) {
+      try {
+        if (!router.invoke(data, remote)) {
+          break;
+        }
+      } catch (error) {
+        const newError = router.error(error, data, remote);
+        newError &&
+          router !== defaultRouter &&
+          defaultRouter.error(error, data, remote);
+
+        break;
+      }
+    }
+  };
+  const invokeRunCallbacks = () => {
+    initCallbacks.onRun.invoke({
+      address: socketConfig,
+    });
+  };
+
+  const initSocket = (socket, onReceive, onRun) => {
+    socket
+      .onReceive(onReceive)
+      .onRun(onRun)
+      .onError()
+      .onTerminate()
+      .run(socketConfig);
   };
 
   //public functions
@@ -78,26 +109,20 @@ module.exports = (
     routers.push(newRouter);
 
     return {
-      bindEndpoint: (route, handler) =>
-        bindEndpointToRouter(newRouter, route, handler),
-      unbindAllEndpoints: () => newRouter.unbindAll(),
+      ...makeChainable({
+        bindEndpoint: (route, handler) => newRouter.bind(route, handler),
+        reset: () => newRouter.reset(),
+        addErrorHandler: (handler) => newRouter.onError(handler),
+      }),
     };
   };
   //"route" must start with ["/](static pattern) or [/\/](RegExp pattern)
-  const bindEndpoint = (route, handler) =>
-    bindEndpointToRouter(defaultRouter, route, handler);
+  const bindEndpoint = (route, handler) => defaultRouter.bind(route, handler);
+  const addErrorHandler = (handler) => defaultRouter.onError(handler);
 
   const run = () => {
-    socket
-      .onReceive(onMessageReceived)
-      .onRun(() =>
-        initCallbacks.onRun.invoke({
-          address: socketConfig,
-        })
-      )
-      .onError()
-      .onTerminate()
-      .run(socketConfig);
+    setDefaultErrorHandler(defaultRouter);
+    initSocket(socket, resolveMessage, invokeRunCallbacks);
   };
   const onRun = (callback) => initCallbacks.onRun.add(callback);
   const onRunExtensions = (callbacks) =>
@@ -115,6 +140,7 @@ module.exports = (
 
     bindRouter,
     bindEndpoint,
+    addErrorHandler,
 
     run,
     onRun,

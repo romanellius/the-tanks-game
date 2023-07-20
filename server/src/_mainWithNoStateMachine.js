@@ -10,7 +10,7 @@ app
     const { ip, port, type } = address;
     console.log(`Server running on ${ip}:${port} (${type})\n`);
   })
-  //invokes on J,T
+  //invokes on J,T,*
   .bindEndpoint("", (data, remote, next) => {
     console.log(`Root logger: ${data?.action}`);
 
@@ -18,25 +18,37 @@ app
     server.connectClient(remote);
 
     next();
+  })
+  .addErrorHandler((error, data, _, next) => {
+    console.error(
+      `Root error: Route ${data?.action} throws error:\n${error.stack}`
+    );
+    next(error);
   });
 
 //invokes on J,T
-const apiRouter = app.bindRouter(/^\/api\//);
-apiRouter.bindEndpoint(null, (data, _, next) => {
+app.bindRouter(/^\/api\//).bindEndpoint(null, (data, _, next) => {
   console.log(`API logger: ${data?.action}`);
   next();
 });
 
 //invokes only on J
-const stateRouter = app.bindRouter("/api/join");
-stateRouter.bindEndpoint(/(?:)/, (data, _, next) => {
-  console.log(`STATE logger: ${data?.action}`);
-  next();
-});
-
-//invokes on J,T
 app
-  .bindEndpoint(undefined, (_, remote) => {
+  .bindRouter("/api/join")
+  .bindEndpoint(/(?:)/, (data, _, next) => {
+    console.log(`STATE logger: ${data?.action}`);
+    next();
+  })
+  .addErrorHandler((error, data) => {
+    console.error(
+      `STATE error: Route ${data?.action} throws error:\n${error.stack}`
+    );
+  });
+
+//invokes on J,T,*
+app
+  .bindRouter(/^\/.*/)
+  .bindEndpoint(/\/.*/, (_, remote) => {
     const server = resolve("core/frameworkInterface");
     server.send(`Hello, ${flattenAddress(remote)}!`, (error) =>
       error
@@ -45,4 +57,13 @@ app
     );
     server.disconnectClient(remote);
   })
-  .run();
+  .addErrorHandler((error, data) => {
+    console.error(`Error: Route ${data?.action} throws error:\n${error.stack}`);
+  });
+
+//request not handled properly
+app.bindRouter(/^\//).bindEndpoint(null, (data) => {
+  console.error(`Warning: Route ${data?.action} is not handled`);
+});
+
+app.run();

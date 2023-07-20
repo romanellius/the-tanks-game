@@ -1,16 +1,13 @@
 ///Message ROUTING///
 
-//TODO: "Error Handling" for Endpoints and States:
-//        next(!undefined and !"router") - skip routes/routers while "error handling" middleware is found
-//        default and user-defined error handlers
-//        try ... catch each routeHandler calling and call next(error) on exception
-//        define error-handlers middleware LAST or separate method for error-handling
+//TODO: "Error Handling" for States ==> basic try-catch inside of the StateMachine extension
 
-module.exports = (isRoutePatternDynamic, rootPattern) => {
+module.exports = (isRoutePatternDynamic, pattern) => {
   //init
-  const routes = [];
+  const routes = [],
+    errorHandlers = [];
 
-  rootPattern = normalizePattern(rootPattern);
+  pattern = normalizePattern(pattern);
 
   //private functions
   function normalizePattern(pattern, isRootPattern) {
@@ -70,7 +67,7 @@ module.exports = (isRoutePatternDynamic, rootPattern) => {
   }
 
   const resolveHandlers = (path) => {
-    const relPath = getRelativePath(path, rootPattern);
+    const relPath = getRelativePath(path, pattern);
     if (!relPath) return genGetRouteHandlers([]);
 
     return genGetRouteHandlers(routes, relPath);
@@ -85,13 +82,15 @@ module.exports = (isRoutePatternDynamic, rootPattern) => {
     pattern = normalizePattern(pattern);
     routes.push({ pattern, handler });
   };
-  const unbindAll = () => {
-    routes.length = 0;
+
+  const reset = () => {
+    routes.length = errorHandlers.length = 0;
   };
+
   const invoke = (data, remote) => {
+    let isInvocationChainFinished = true;
     const genHandlers = resolveHandlers(data?.action);
 
-    let resolvedCount = 0;
     const invokeNextHandler = (doSkip = false) => {
       const handlerResult = genHandlers.next();
 
@@ -99,18 +98,55 @@ module.exports = (isRoutePatternDynamic, rootPattern) => {
       if (doInvokeNextHandler) {
         const handler = handlerResult.value;
         handler(data, remote, invokeNextHandler);
-
-        resolvedCount++;
+      } else {
+        isInvocationChainFinished = false;
       }
     };
     invokeNextHandler();
 
-    return resolvedCount > 0;
+    return !isInvocationChainFinished;
+  };
+
+  const addErrorHandler = (handler) => {
+    if (typeof handler !== "function") {
+      throw `Error: Error handler "${handler}" can not be set: handler is not a function`;
+    }
+
+    errorHandlers.push(handler);
+  };
+
+  const handleError = (error, data, remote) => {
+    let isInvocationChainFinished = true;
+    let errorHandlerIndex = 0;
+
+    const invokeNextErrorHandler = (error) => {
+      if (errorHandlerIndex < errorHandlers.length) {
+        try {
+          errorHandlers[errorHandlerIndex++](
+            error,
+            data,
+            remote,
+            invokeNextErrorHandler
+          );
+        } catch (error) {
+          invokeNextErrorHandler(error);
+        }
+      } else {
+        isInvocationChainFinished = false;
+      }
+    };
+    invokeNextErrorHandler(error);
+
+    return !isInvocationChainFinished;
   };
 
   return {
     bind,
-    unbindAll,
     invoke,
+
+    onError: addErrorHandler,
+    error: handleError,
+
+    reset,
   };
 };

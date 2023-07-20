@@ -13,7 +13,21 @@ app
     console.log(`Logger: ${data?.action}`);
     next();
   })
-  .run();
+  .addErrorHandler((error, data) => {
+    console.error(`Error: Route ${data?.action} throws error: ${error}`);
+  });
+
+//request not handled properly
+app
+  .bindRouter(/^\//)
+  .bindEndpoint(null, (data) => {
+    console.error(`Warning: Route ${data?.action} is not handled`);
+  })
+  .addErrorHandler((error, _data, _remote, next) => {
+    next(error);
+  });
+
+app.run();
 
 /*.bindRoute("ping", (_, remote) => {
   server.updateClient(remote);

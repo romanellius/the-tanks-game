@@ -26,13 +26,29 @@ module.exports = {
   //servers
   "core/server/server": {
     path: "./src/core/server/server",
-    handler: (path, protocol, clients, router, callbacks, config) =>
-      require(path)(protocol, clients, router, callbacks, config),
+    handler: (
+      path,
+      protocol,
+      clients,
+      router,
+      callbacks,
+      makeChainable,
+      config
+    ) =>
+      require(path)(
+        protocol,
+        clients,
+        router,
+        callbacks,
+        makeChainable,
+        config
+      ),
     dependencies: [
       "core/server/protocols/udp",
       "core/server/clients",
       "core/server/router",
       "core/server/initCallbacks",
+      "helpers/makeFunctionChainable",
       "config",
     ],
     isSingleton: true,

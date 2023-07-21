@@ -22,7 +22,7 @@ app
   })
   .addErrorHandler((error, data, _, next) => {
     console.error(
-      `Root error: Route ${data?.action} throws error:\n${error.stack}`
+      `Root error: Route ${data?.action} throws error:\n${error?.stack}`
     );
     next(error);
   });
@@ -42,7 +42,7 @@ app
   })
   .addErrorHandler((error, data) => {
     console.error(
-      `STATE error: Route ${data?.action} throws error:\n${error.stack}`
+      `STATE error: Route ${data?.action} throws error:\n${error?.stack}`
     );
   });
 
@@ -59,7 +59,9 @@ app
     server.disconnectClient(remote);
   })
   .addErrorHandler((error, data) => {
-    console.error(`Error: Route ${data?.action} throws error:\n${error.stack}`);
+    console.error(
+      `Error: Route ${data?.action} throws error:\n${error?.stack}`
+    );
   });
 
 //request not handled properly

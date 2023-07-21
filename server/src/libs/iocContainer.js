@@ -1,6 +1,7 @@
 ///IOC CONTAINER///
 
 const { resolvePath } = require("./fileHelper");
+const { isObject } = require("../utils/objectHelper");
 const configObject = require("../iocConfig");
 
 //init
@@ -9,13 +10,13 @@ build(container, configObject);
 
 //private functions
 function validateConfiguration(configObject) {
-  if (typeof configObject !== "object") {
+  if (!isObject(configObject)) {
     throw "IoC Container: 'dependencies.js' must export an object";
   }
 
   for (const dependencyName in configObject) {
     const dependency = configObject[dependencyName];
-    if (typeof dependency !== "object") {
+    if (!isObject(dependency)) {
       throw "IoC Container: each dependency must be an object in 'dependencies.js'";
     }
 
@@ -50,7 +51,7 @@ function registerDependency(
   isSingleton
 ) {
   if (container[name]) {
-    throw `IocContainer: Can not register '${name}' dependency: occupied`;
+    throw `IoC Container: Can not register '${name}' dependency: occupied`;
   }
 
   container[name] = { argDependencies, handler, isSingleton };
@@ -94,7 +95,7 @@ const registerSingleton = function (name, handler, argDependencies = []) {
 const resolve = (name, ...props) => {
   const dependency = container[name];
   if (!dependency) {
-    throw `IocContainer: Dependency '${name}' not found`;
+    throw `IoC Container: Dependency '${name}' not found`;
   }
 
   const { isSingleton, handler, argDependencies, instance } = dependency;

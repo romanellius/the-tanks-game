@@ -97,6 +97,10 @@ module.exports = {
     path: "./src/utils/jsonHelper",
     handler: (path) => require(path).stringifyWithMapDataType,
   },
+  "helpers/isObject": {
+    path: "./src/utils/objectHelper",
+    handler: (path) => require(path).isObject,
+  },
   "helpers/isRoutePatternDynamic": {
     path: "./src/utils/regexpHelper",
     handler: (path) => require(path).isRegExp,

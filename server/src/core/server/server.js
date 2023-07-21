@@ -31,7 +31,7 @@ module.exports = (
 
     try {
       const data = JSON.parse(buffer.toString());
-      if (!data?.action) throw `Router: Can not handle empty route`;
+      if (!data?.action) throw "Router: Can not handle empty route";
       return data;
     } catch (error) {
       console.error(`Error: ${error}`);

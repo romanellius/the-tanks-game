@@ -108,7 +108,9 @@ module.exports = (isRoutePatternDynamic, pattern) => {
 
   const addErrorHandler = (handler) => {
     if (typeof handler !== "function") {
-      throw `Error: Error handler "${handler}" can not be set: handler is not a function`;
+      throw `Error: Error handler "${JSON.stringify(
+        handler ?? {}
+      )}" can not be set: handler is not a function`;
     }
 
     errorHandlers.push(handler);

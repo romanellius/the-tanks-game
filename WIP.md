@@ -4,3 +4,5 @@
 - [ ] Config: maxRequestsPerSocket, pluginTimeout, trustProxy[https://github.com/jshttp/proxy-addr]
 - [ ] Routes: caseSensitive, ignoreTailingSlash, allowUnsafeRegex[https://github.com/fastify/safe-regex2]
 - [ ] Add server props: onExtensionsLoaded, getDefaultRoute, setDefaultRoute
+- [ ] Add nested states support for StateMachine extension [https://xstate.js.org/docs/]
+- [ ] Add parallel states support for StateMachine extension [https://xstate.js.org/docs/]

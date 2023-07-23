@@ -45,8 +45,7 @@ const generateWorld = (server) => {
     ],
   ]);
 
-  //TODO: replace global with useContext like in React or xstate.js.org/docs/guides/context.html#initial-context
-  global._worldState = {
+  return {
     round: roundNumber++ % 3,
     map,
     flag,
@@ -55,17 +54,23 @@ const generateWorld = (server) => {
   };
 };
 
-module.exports = (server, { resolve }) => {
-  const stringifyWithMapDataType = resolve("helpers/stringifyWithMap");
+module.exports = (framework) => {
+  const { iocContainer, context, server } = framework;
+  const stringifyWithMap = iocContainer.resolve("helpers/stringifyWithMap");
 
   return {
     handler: () => {
-      generateWorld(server);
+      const worldState = generateWorld(server);
+      if (context.has({ worldState }) === true) {
+        context.update({ worldState });
+      } else {
+        context.add({ worldState });
+      }
 
       server.send(
-        stringifyWithMapDataType({
+        stringifyWithMap({
           action: "roundOnRun",
-          state: global._worldState,
+          state: worldState,
         })
       );
 

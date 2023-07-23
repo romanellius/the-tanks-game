@@ -1,15 +1,32 @@
 const roundEndDelay = 1_000; //3_000;
 
-module.exports = (server) => ({
-  handler: () => {
-    server.send(
-      JSON.stringify({ action: "roundOnEnd", stats: "ROUND STATISTICS" })
-    );
+module.exports = (framework) => {
+  const {
+    context: { use: useContext, remove: removeContext },
+    server,
+  } = framework;
 
-    setTimeout(() => {
-      server.stateTransitionTo(
-        global._worldState.round === 2 ? "next" : "prev"
+  return {
+    handler: () => {
+      const { worldState } = useContext();
+
+      server.send(
+        JSON.stringify({
+          action: "roundOnEnd",
+          stats: `ROUND STATISTICS: ${
+            worldState.timeIsOver ? "time is over" : "time is not over"
+          }`,
+        })
       );
-    }, roundEndDelay);
-  },
-});
+
+      setTimeout(() => {
+        if (worldState.round === 2) {
+          removeContext({ worldState });
+          server.stateTransitionTo("next");
+        } else {
+          server.stateTransitionTo("prev");
+        }
+      }, roundEndDelay);
+    },
+  };
+};

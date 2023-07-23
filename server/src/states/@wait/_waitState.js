@@ -3,12 +3,12 @@ const endpoints = {
   leave: "/leave",
 };
 
-module.exports = (server) => {
+module.exports = ({ server }) => {
   return {
-    handler: (stateRouter) => {
+    handler: (router) => {
       server.clearClients();
 
-      stateRouter.bindEndpoint(endpoints.join, (_, remote) => {
+      router.bindEndpoint(endpoints.join, (_, remote) => {
         server.connectClient(
           remote,
           () =>
@@ -16,7 +16,7 @@ module.exports = (server) => {
         );
       });
 
-      stateRouter.bindEndpoint(endpoints.leave, (_, remote) => {
+      router.bindEndpoint(endpoints.leave, (_, remote) => {
         server.disconnectClient(remote);
       });
     },

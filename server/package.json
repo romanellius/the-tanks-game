@@ -8,5 +8,8 @@
     "_devTest": "node src/_mainWithNoStateMachine.js"
   },
   "author": "RAM",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "lodash.clonedeep": "^4.5.0"
+  }
 }

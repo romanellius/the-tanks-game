@@ -23,7 +23,7 @@ const getFolders = (path) => {
 const getMatchingFileAbsPath = (absFolderPath, pattern) => {
   const entries = fs.readdirSync(absFolderPath);
 
-  const name = entries.find((entry) => pattern.exec(entry).length > 0);
+  const name = entries.find((entry) => pattern.exec(entry)?.length > 0);
   return name && join(absFolderPath, name);
 };
 

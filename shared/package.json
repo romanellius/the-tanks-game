@@ -2,8 +2,11 @@
   "name": "multiplayercommon",
   "version": "1.0.0",
   "description": "",
-  "main": "const.js",
+  "main": "src/index.js",
   "scripts": {},
   "author": "RAM",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "lodash.clonedeep": "^4.5.0"
+  }
 }

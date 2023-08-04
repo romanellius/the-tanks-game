@@ -1,5 +1,3 @@
-const flattenAddress = require("../../libs/addressHelper").toString;
-
 let localWorldState;
 
 const tickRate = 1;
@@ -193,6 +191,7 @@ module.exports = (framework) => {
     server,
   } = framework;
 
+  const flattenAddress = resolveDependency("helpers/flattenAddress");
   const stringifyWithMapDataType = resolveDependency(
     "helpers/stringifyWithMap"
   );

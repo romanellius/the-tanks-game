@@ -1,8 +1,6 @@
 ///CLIENTS Handling///
 
-const flattenAddress = require("../../libs/addressHelper").toString;
-
-module.exports = () => {
+module.exports = (flattenAddress) => {
   const connectedClients = new Map();
 
   const getCount = () => connectedClients.size;

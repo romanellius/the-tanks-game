@@ -1,6 +1,6 @@
-import udp from "dgram";
-import { Buffer } from "buffer";
-import constants from "../../shared/src/const.js";
+const udp = require("dgram");
+const { Buffer } = require("buffer");
+const { constants } = require("../../shared");
 const { /*MTU,*/ SERVER_CONFIG } = constants;
 
 /*const { mtu_recommended_size, mtu_size_warning } = MTU;*/

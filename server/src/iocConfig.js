@@ -19,8 +19,8 @@ module.exports = {
   },
   "core/useExtensions": {
     path: "./src/core/useExtensions",
-    handler: (path, server) => require(path)(server),
-    dependencies: ["core/server/server"],
+    handler: (path, server, fileHelper) => require(path)(server, fileHelper),
+    dependencies: ["core/server/server", "helpers/fileHelper"],
   },
 
   //-- server
@@ -55,7 +55,8 @@ module.exports = {
   },
   "core/server/clients": {
     path: "./src/core/server/clients",
-    handler: (path) => require(path)(),
+    handler: (path, flattenAddress) => require(path)(flattenAddress),
+    dependencies: ["helpers/flattenAddress"],
   },
   "core/server/initCallbacks": {
     path: "./src/core/server/initCallbacks",
@@ -85,6 +86,15 @@ module.exports = {
     path: "./src/utils/functionHelper",
     handler: (path) => require(path),
   },
+  "helpers/fileHelper": {
+    path: "../shared",
+    handler: (path) => require(path).utils.fileHelper,
+  },
+  //TODO: uncomment on moving 'core' to separate project
+  // "helpers/flattenAddress": {
+  //   path: "../shared",
+  //   handler: (path) => require(path).utils.addressHelper.toString,
+  // },
 
   // business logic
   //- non-function dependencies
@@ -93,10 +103,14 @@ module.exports = {
     path: "./src/utils/jsonHelper",
     handler: (path) => require(path).stringifyWithMapDataType,
   },
+  "helpers/flattenAddress": {
+    path: "../shared",
+    handler: (path) => require(path).utils.addressHelper.toString,
+  },
 
   //-- constants
   config: {
-    path: "../shared/src/const",
-    handler: (path) => require(path).SERVER_CONFIG,
+    path: "../shared",
+    handler: (path) => require(path).constants.SERVER_CONFIG,
   },
 };

@@ -5,11 +5,8 @@
   "main": "main.js",
   "scripts": {
     "dev": "node src/main.js",
-    "_devTest": "node src/_mainWithNoStateMachine.js"
+    "devTest": "node src/_mainWithNoStateMachine.js"
   },
   "author": "RAM",
-  "license": "ISC",
-  "dependencies": {
-    "lodash.clonedeep": "^4.5.0"
-  }
+  "license": "ISC"
 }

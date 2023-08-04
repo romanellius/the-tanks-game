@@ -1,8 +1,6 @@
 ///EXTENSIONS Binding///
 
-const { getFolders, getMatchingFileAbsPath } = require("../libs/fileHelper");
-
-module.exports = (server) => {
+module.exports = (server, { getFolders, getMatchingFileAbsPath }) => {
   const allConfigHandlers = {};
   const runHandlers = [];
 

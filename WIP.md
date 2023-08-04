@@ -1,3 +1,4 @@
+- [ ] FIX: Enumerate all matches in "router"
 - [ ] Add payload check for UDP packages on client and server side {const crc = require("crc"); crc.crc32('hello').toString(16)}
 - [ ] Add payload validation [https://json-schema.org/]?
 - [ ] Add async-await support everywhere in the core
@@ -6,7 +7,6 @@
 - [ ] Add server props: onExtensionsLoaded, getDefaultRoute, setDefaultRoute
 - [ ] Add nested states support for StateMachine extension [https://xstate.js.org/docs/]
 - [ ] Add parallel states support for StateMachine extension [https://xstate.js.org/docs/]
-- [ ] Move out IocContainer, Core and Extensions to separate projects, add built-in support for different IoC Containers
 - [ ] Add tests
 - [ ] Horizontal scaling
 - [ ] Add more transport protocols

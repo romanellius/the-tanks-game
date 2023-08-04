@@ -30,7 +30,6 @@ module.exports = (isRoutePatternDynamic, pattern) => {
     if (isRoutePatternDynamic(rootPattern)) {
       const matches = rootPattern.exec(path);
       if (matches) {
-        //FIXME: enumerate all matches
         matchLength = matches[0].length;
       }
     } else {

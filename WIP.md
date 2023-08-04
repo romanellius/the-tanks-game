@@ -8,3 +8,17 @@
 - [ ] Add parallel states support for StateMachine extension [https://xstate.js.org/docs/]
 - [ ] Move out IocContainer, Core and Extensions to separate projects
 - [ ] Add tests
+- [ ] Horizontal scaling
+- [ ] Add more transport protocols
+  - add protocol with handling packet loss, retransmissions, and ordering features
+  - TCP, WebSockets
+- [ ] Encryption: TLS?
+- [ ] Serialization with binary formats
+- [ ] Network:
+  - network synchronization (client-side prediction and server reconciliation)
+  - latency compensation (lag compensation and interpolation)
+  - data consistency (state synchronization and conflict resolution).
+- [ ] Auth
+- [ ] Matchmaking and game sessions
+- [ ] Documentation: Getting started, API References, Examples
+- [ ] Logging

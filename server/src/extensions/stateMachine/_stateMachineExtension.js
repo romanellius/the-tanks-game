@@ -12,10 +12,6 @@ const iocContainer = require("../../libs/iocContainer");
 
 const createContext = require("./context");
 
-const { resolve } = iocContainer;
-const server = resolve("core/server/server");
-const frameworkInterface = resolve("core/frameworkInterface");
-
 //init
 const states = {};
 
@@ -44,7 +40,7 @@ const registerStateContext = () => {
   stateContext = createContext();
 };
 
-const registerStateRouter = (path) => {
+const registerStateRouter = (server, path) => {
   if (stateRouter) {
     throw "State Machine: Router: Already has been registered";
   }
@@ -52,7 +48,7 @@ const registerStateRouter = (path) => {
   stateRouter = server.bindRouter(path);
 };
 
-const bindServerProps = () => {
+const bindServerProps = (frameworkInterface) => {
   for (const propName in runtimeServerProps) {
     frameworkInterface[propName] = runtimeServerProps[propName];
   }
@@ -63,7 +59,7 @@ const getStateConfig = () => {
   return JSON.parse(stateConfigJson);
 };
 
-const getStateDataFromFolderStructure = (stateFolders) => {
+const getStateDataFromFolderStructure = (frameworkInterface, stateFolders) => {
   const stateFilePattern = /^_[^_\.]*\.js$/;
 
   return stateFolders.reduce((stateData, { name, absPath }) => {
@@ -86,7 +82,7 @@ const getStateDataFromFolderStructure = (stateFolders) => {
   }, []);
 };
 
-const getStateDataFromFileStructure = (path) => {
+const getStateDataFromFileStructure = (frameworkInterface, path) => {
   const stateData = [];
 
   for (const file of getAllFiles(path)) {
@@ -106,13 +102,13 @@ const getStateDataFromFileStructure = (path) => {
   return stateData;
 };
 
-const getStateData = () => {
+const getStateData = (frameworkInterface) => {
   const path = "./src/states";
   const nestedFolders = getFolders(path);
 
   return nestedFolders.length === 0
-    ? getStateDataFromFileStructure(path)
-    : getStateDataFromFolderStructure(nestedFolders);
+    ? getStateDataFromFileStructure(frameworkInterface, path)
+    : getStateDataFromFolderStructure(frameworkInterface, nestedFolders);
 };
 
 const validateConfiguration = (stateConfig, stateData) => {
@@ -198,17 +194,19 @@ const invokeDisposeHandler = (state) => {
 };
 
 //main functions
-const build = (routerPattern = /^\/api/) => {
+const build = (server, routerPattern = /^\/api/) => {
   if (Object.keys(states).length) {
     throw "State Machine: Already has been built";
   }
 
+  registerStateRouter(server, routerPattern);
   registerStateContext();
-  registerStateRouter(routerPattern);
-  bindServerProps();
 
+  const frameworkInterface = require("../../core/frameworkInterface")(server);
+  bindServerProps(frameworkInterface);
+
+  const stateData = getStateData(frameworkInterface);
   const stateConfig = getStateConfig();
-  const stateData = getStateData();
   validateConfiguration(stateConfig, stateData);
 
   bindStateConditions(stateConfig);
@@ -242,9 +240,11 @@ const run = (state) => {
   invokeHandler(currState);
 };
 
-module.exports = {
-  config: {
-    useStateMachine: build,
-  },
-  run: () => initState && run(initState),
+module.exports = (server) => {
+  return {
+    config: {
+      useStateMachine: (routerPattern) => build(server, routerPattern),
+    },
+    run: () => initState && run(initState),
+  };
 };

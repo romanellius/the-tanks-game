@@ -19,7 +19,8 @@ module.exports = {
   },
   "core/useExtensions": {
     path: "./src/core/useExtensions",
-    handler: (path) => require(path)(),
+    handler: (path, server) => require(path)(server),
+    dependencies: ["core/server/server"],
   },
 
   //-- server

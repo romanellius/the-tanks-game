@@ -6,9 +6,9 @@ const {
   getAllFiles,
   getFile,
   getFileNameWithNoExtension,
-} = require("../../../libs/fileHelper");
-const { isObject } = require("../../../libs/objectHelper");
-const iocContainer = require("../../../libs/iocContainer");
+} = require("../../libs/fileHelper");
+const { isObject } = require("../../libs/objectHelper");
+const iocContainer = require("../../libs/iocContainer");
 
 const createContext = require("./context");
 

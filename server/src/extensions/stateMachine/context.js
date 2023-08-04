@@ -1,4 +1,4 @@
-const { isObject, createClone } = require("../../../libs/objectHelper");
+const { isObject, createClone } = require("../../libs/objectHelper");
 
 //private functions
 const processNames = (names) => {

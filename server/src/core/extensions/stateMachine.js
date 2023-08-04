@@ -26,27 +26,24 @@ let stateRouter;
 let stateContext;
 
 const runtimeServerProps = {
-  getStateRouter: () => getRouterInterface(stateRouter),
   stateTransitionTo: safeTransitionTo,
 };
 
 //private functions
-function getRouterInterface(router) {
-  const { bindEndpoint, addErrorHandler } = router;
-  return { bindEndpoint, addErrorHandler };
-}
+const isRun = () => !!currState;
 
 function safeTransitionTo(nextInput) {
   isRun() && transitionTo(nextInput);
 }
 
-const validateObject = (object) => {
+const getPropertyNames = (object) => {
   const objPropertyNames = isObject(object) && Object.keys(object);
   if (!objPropertyNames || !objPropertyNames.length) {
     throw `State Machine: Context: Invalid object "${JSON.stringify(
       object ?? {}
     )}": incorrect format`;
   }
+
   return objPropertyNames;
 };
 
@@ -56,75 +53,84 @@ const processNames = (names) => {
     return names[0];
   }
   //[ { var1, var2 } ]
-  else if (isObject(names[0])) {
+  if (isObject(names[0])) {
     return Object.keys(names[0]);
   }
   //[ "var1", "var2" ]
   return names;
 };
 
-const filterProperties = (target, source, checkExistence) =>
-  source.filter((value) => checkExistence === target.hasOwnProperty(value));
+const filterProperties = (target, source, checkExistence) => {
+  return source.filter(
+    (value) => checkExistence === target.hasOwnProperty(value)
+  );
+};
 
+//TODO: move "createContext" outside of the file
 const createContext = () => {
   const context = {};
 
+  const has = (...names) => {
+    names = processNames(names);
+    if (!names.length) {
+      throw "State Machine: Context: Can not iterate empty list: incorrect format";
+    }
+
+    const notExistingNames = filterProperties(context, names, false);
+    //returns: 'true' if all names exist, 'array of not existing names' otherwise
+    return notExistingNames.length ? notExistingNames : true;
+  };
+
+  const add = (object) => {
+    const objPropertyNames = getPropertyNames(object);
+
+    const existingKeys = filterProperties(context, objPropertyNames, true);
+    if (existingKeys.length) {
+      throw `State Machine: Context: Can not add "${JSON.stringify(
+        existingKeys
+      )}": do exist`;
+    }
+
+    Object.assign(context, object);
+  };
+
+  const update = (object) => {
+    const objPropertyNames = getPropertyNames(object);
+
+    const notExistingKeys = filterProperties(context, objPropertyNames, false);
+    if (notExistingKeys.length) {
+      throw `State Machine: Context: Can not update "${JSON.stringify(
+        notExistingKeys
+      )}": do not exist`;
+    }
+
+    Object.assign(context, object);
+  };
+
+  const remove = (...names) => {
+    names = processNames(names);
+    if (!names.length) {
+      throw "State Machine: Context: Can not remove empty list: incorrect format";
+    }
+
+    const notExistingNames = filterProperties(context, names, false);
+    if (notExistingNames.length) {
+      throw `State Machine: Context: Can not remove "${JSON.stringify(
+        notExistingNames
+      )}": do not exist`;
+    }
+
+    names.forEach((name) => delete context[name]);
+  };
+
+  const use = () => createClone(context);
+
   return {
-    use: () => createClone(context),
-    add: (object) => {
-      const objPropertyNames = validateObject(object);
-
-      const existingKeys = filterProperties(context, objPropertyNames, true);
-      if (existingKeys.length) {
-        throw `State Machine: Context: Can not add "${JSON.stringify(
-          existingKeys
-        )}": do exist`;
-      }
-
-      Object.assign(context, object);
-    },
-    update: (object) => {
-      const objPropertyNames = validateObject(object);
-
-      const notExistingKeys = filterProperties(
-        context,
-        objPropertyNames,
-        false
-      );
-      if (notExistingKeys.length) {
-        throw `State Machine: Context: Can not update "${JSON.stringify(
-          notExistingKeys
-        )}": do not exist`;
-      }
-
-      Object.assign(context, object);
-    },
-
-    has: (...names) => {
-      names = processNames(names);
-      if (!names.length) {
-        throw "State Machine: Context: Can not iterate empty list: incorrect format";
-      }
-
-      const notExistingNames = filterProperties(context, names, false);
-      //returns: 'true' if all names exist, 'array of not existing names' otherwise
-      return notExistingNames.length ? notExistingNames : true;
-    },
-    remove: (...names) => {
-      names = processNames(names);
-      if (!names.length) {
-        throw "State Machine: Context: Can not remove empty list: incorrect format";
-      }
-
-      const notExistingNames = filterProperties(context, names, false);
-      if (notExistingNames.length) {
-        throw `State Machine: Context: Can not remove "${JSON.stringify(
-          notExistingNames
-        )}": do not exist`;
-      }
-
-      names.forEach((name) => delete context[name]);
-    },
+    has,
+    add,
+    update,
+    remove,
+    use,
   };
 };
 
@@ -199,8 +205,8 @@ const getStateDataFromFileStructure = (path) => {
 
 const getStateData = () => {
   const path = "./src/states";
-
   const nestedFolders = getFolders(path);
+
   return nestedFolders.length === 0
     ? getStateDataFromFileStructure(path)
     : getStateDataFromFolderStructure(nestedFolders);
@@ -270,7 +276,9 @@ const bindStateHandlers = (stateData) => {
 };
 
 const invokeHandler = (state) => {
-  const stateRouterInterface = getRouterInterface(stateRouter);
+  const { bindEndpoint, addErrorHandler } = stateRouter;
+  const stateRouterInterface = { bindEndpoint, addErrorHandler };
+
   try {
     states[state].handler(stateRouterInterface);
   } catch (error) {
@@ -320,8 +328,6 @@ const transitionTo = (nextInput) => {
   invokeHandler(currState);
   return true;
 };
-
-const isRun = () => !!currState;
 
 const run = (state) => {
   if (isRun()) {

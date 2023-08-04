@@ -2,7 +2,7 @@
 
 const { getAllFiles } = require("../libs/fileHelper");
 
-const bindExtensions = () => {
+module.exports = () => {
   const allConfigHandlers = {};
   const runHandlers = [];
 
@@ -14,9 +14,7 @@ const bindExtensions = () => {
   }
 
   return {
-    getConfigHandlers: () => allConfigHandlers,
-    getRunHandlers: () => runHandlers,
+    configHandlers: allConfigHandlers,
+    runHandlers,
   };
 };
-
-module.exports = bindExtensions;

@@ -6,3 +6,5 @@
 - [ ] Add server props: onExtensionsLoaded, getDefaultRoute, setDefaultRoute
 - [ ] Add nested states support for StateMachine extension [https://xstate.js.org/docs/]
 - [ ] Add parallel states support for StateMachine extension [https://xstate.js.org/docs/]
+- [ ] Move out IocContainer, Core and Extensions to separate projects
+- [ ] Add tests

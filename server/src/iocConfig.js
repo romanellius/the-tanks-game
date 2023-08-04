@@ -55,8 +55,7 @@ module.exports = {
   },
   "core/server/clients": {
     path: "./src/core/server/clients",
-    handler: (path, flattenAddress) => require(path)(flattenAddress),
-    dependencies: ["helpers/flattenAddress"],
+    handler: (path) => require(path)(),
   },
   "core/server/initCallbacks": {
     path: "./src/core/server/initCallbacks",
@@ -85,10 +84,6 @@ module.exports = {
   },
 
   //utils
-  "helpers/flattenAddress": {
-    path: "./src/utils/addressHelper",
-    handler: (path) => require(path).toString,
-  },
   "helpers/functionHelper": {
     path: "./src/utils/functionHelper",
     handler: (path) => require(path),
@@ -96,10 +91,6 @@ module.exports = {
   "helpers/stringifyWithMap": {
     path: "./src/utils/jsonHelper",
     handler: (path) => require(path).stringifyWithMapDataType,
-  },
-  "helpers/objectHelper": {
-    path: "./src/utils/objectHelper",
-    handler: (path) => require(path),
   },
   "helpers/isRoutePatternDynamic": {
     path: "./src/utils/regexpHelper",

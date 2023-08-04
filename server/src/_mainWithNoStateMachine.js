@@ -1,8 +1,8 @@
 ///ENTRY POINT///
 
+const flattenAddress = require("./libs/addressHelper").toString;
 const { resolve } = require("./libs/iocContainer");
 
-const flattenAddress = resolve("helpers/flattenAddress");
 const appBuilder = resolve("core/frameworkBuilder");
 const app = appBuilder.build(false);
 

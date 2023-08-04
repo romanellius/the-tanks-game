@@ -1,7 +1,7 @@
 ///IOC CONTAINER///
 
 const { resolvePath } = require("./fileHelper");
-const { isObject } = require("../utils/objectHelper");
+const { isObject } = require("./objectHelper");
 const configObject = require("../iocConfig");
 
 //init

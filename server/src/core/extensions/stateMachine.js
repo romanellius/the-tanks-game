@@ -7,14 +7,12 @@ const {
   getFile,
   getFileNameWithNoExtension,
 } = require("../../libs/fileHelper");
-
+const { isObject, createClone } = require("../../libs/objectHelper");
 const iocContainer = require("../../libs/iocContainer");
-const { resolve } = iocContainer;
 
+const { resolve } = iocContainer;
 const server = resolve("core/server/server");
 const frameworkInterface = resolve("core/frameworkInterface");
-
-const { isObject, createClone } = resolve("helpers/objectHelper");
 
 //init
 const states = {};

@@ -6,7 +6,7 @@
 - [ ] Add server props: onExtensionsLoaded, getDefaultRoute, setDefaultRoute
 - [ ] Add nested states support for StateMachine extension [https://xstate.js.org/docs/]
 - [ ] Add parallel states support for StateMachine extension [https://xstate.js.org/docs/]
-- [ ] Move out IocContainer, Core and Extensions to separate projects
+- [ ] Move out IocContainer, Core and Extensions to separate projects, add built-in support for different IoC Containers
 - [ ] Add tests
 - [ ] Horizontal scaling
 - [ ] Add more transport protocols
@@ -20,5 +20,12 @@
   - data consistency (state synchronization and conflict resolution).
 - [ ] Auth
 - [ ] Matchmaking and game sessions
-- [ ] Documentation: Getting started, API References, Examples
-- [ ] Logging
+- [ ] Documentation (.docs/): Getting started, API References, Examples
+- [ ] Logging and Monitoring
+- [ ] Profiling and Benchmarking
+- [ ] Use Static Code Analyzers
+- [ ] Caching
+- [ ] DB support
+- [ ] Anti-cheat
+- [ ] Voice and Message Chat
+- [ ] Integration (SDKs) with Unity and Unreal

@@ -63,12 +63,11 @@ module.exports = (
 
     for (const router of routers) {
       try {
-        if (!router.invoke(data, remote)) {
-          break;
-        }
+        const doInvokeNextRouteHandler = router.invoke(data, remote);
+        if (!doInvokeNextRouteHandler) break;
       } catch (error) {
-        const newError = router.error(error, data, remote);
-        newError &&
+        const doInvokeNextErrorHandler = router.error(error, data, remote);
+        doInvokeNextErrorHandler &&
           router !== defaultRouter &&
           defaultRouter.error(error, data, remote);
 

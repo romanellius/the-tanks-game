@@ -6,9 +6,9 @@ const {
   getAllFiles,
   getFile,
   getFileNameWithNoExtension,
-} = require("../../libs/fileHelper");
-const { isObject, createClone } = require("../../libs/objectHelper");
-const iocContainer = require("../../libs/iocContainer");
+} = require("../../../libs/fileHelper");
+const { isObject, createClone } = require("../../../libs/objectHelper");
+const iocContainer = require("../../../libs/iocContainer");
 
 const { resolve } = iocContainer;
 const server = resolve("core/server/server");
@@ -170,6 +170,7 @@ const getStateDataFromFolderStructure = (stateFolders) => {
         iocContainer,
         context: stateContext,
       });
+
       stateData.push({
         name,
         handler,

@@ -1,16 +1,21 @@
 ///EXTENSIONS Binding///
 
-const { getAllFiles } = require("../libs/fileHelper");
+const { getFolders, getMatchingFileAbsPath } = require("../libs/fileHelper");
 
 module.exports = () => {
   const allConfigHandlers = {};
   const runHandlers = [];
 
-  for (const file of getAllFiles("src/core/extensions")) {
-    const { config: configHandlers, run: runHandler } = require(file.absPath);
+  const extensionFilePattern = /^_[^_\.]*\.js$/;
 
-    Object.assign(allConfigHandlers, configHandlers);
-    runHandlers.push(runHandler);
+  for (const { absPath } of getFolders("./src/core/extensions")) {
+    const fileAbsPath = getMatchingFileAbsPath(absPath, extensionFilePattern);
+    if (fileAbsPath) {
+      const { config: configHandlers, run: runHandler } = require(fileAbsPath);
+
+      Object.assign(allConfigHandlers, configHandlers);
+      runHandlers.push(runHandler);
+    }
   }
 
   return {

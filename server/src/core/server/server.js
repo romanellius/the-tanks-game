@@ -76,8 +76,10 @@ module.exports = (
     }
   };
   const invokeRunCallbacks = () => {
+    const { address: ip, family: type, port } = socket.getAddress();
+
     initCallbacks.onRun.invoke({
-      address: socketConfig,
+      address: { ip, port, type },
     });
   };
 

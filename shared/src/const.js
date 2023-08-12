@@ -1,6 +1,5 @@
 module.exports = {
   SERVER_CONFIG: {
-    ip: "0.0.0.0",
     port: 4444,
     type: "udp4",
   },

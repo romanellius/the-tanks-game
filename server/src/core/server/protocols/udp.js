@@ -5,9 +5,7 @@ const udp = require("dgram");
 module.exports = ({ type: socketType }) => {
   const udpSocket = udp.createSocket(socketType);
 
-  const getAddress = () => {
-    udpSocket.address();
-  };
+  const getAddress = () => udpSocket.address();
   const send = (data, port, ip, callback) => {
     udpSocket.send(data, port, ip, callback);
   };
@@ -19,8 +17,8 @@ module.exports = ({ type: socketType }) => {
     return this;
   };
 
-  const run = ({ port, ip }) => {
-    udpSocket.bind(port, ip);
+  const run = ({ port }) => {
+    udpSocket.bind(port);
   };
   const onRun = function (callback) {
     udpSocket.on("listening", () => callback && callback());
@@ -45,7 +43,7 @@ module.exports = ({ type: socketType }) => {
   };
 
   return {
-    //getAddress,
+    getAddress,
     send,
     onReceive,
     run,

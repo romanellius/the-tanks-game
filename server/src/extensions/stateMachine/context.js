@@ -1,40 +1,40 @@
 const { isObject, createClone } =
   require("../../../../shared").utils.objectHelper;
 
-//private functions
-const processNames = (names) => {
-  //[ ["var1", "var2"] ]
-  if (Array.isArray(names[0])) {
-    return names[0];
-  }
-  //[ { var1, var2 } ]
-  if (isObject(names[0])) {
-    return Object.keys(names[0]);
-  }
-  //[ "var1", "var2" ]
-  return names;
-};
-
-const filterProperties = (target, source, checkExistence) => {
-  return source.filter(
-    (value) => checkExistence === target.hasOwnProperty(value)
-  );
-};
-
-const getPropertyNames = (object) => {
-  const objPropertyNames = isObject(object) && Object.keys(object);
-  if (!objPropertyNames || !objPropertyNames.length) {
-    throw `State Machine: Context: Invalid object "${JSON.stringify(
-      object ?? {}
-    )}": incorrect format`;
-  }
-
-  return objPropertyNames;
-};
-
 module.exports = () => {
   //init
   const context = {};
+
+  //private functions
+  const processNames = (names) => {
+    //[ ["var1", "var2"] ]
+    if (Array.isArray(names[0])) {
+      return names[0];
+    }
+    //[ { var1, var2 } ]
+    if (isObject(names[0])) {
+      return Object.keys(names[0]);
+    }
+    //[ "var1", "var2" ]
+    return names;
+  };
+
+  const filterProperties = (target, source, checkExistence) => {
+    return source.filter(
+      (value) => checkExistence === target.hasOwnProperty(value)
+    );
+  };
+
+  const getPropertyNames = (object) => {
+    const objPropertyNames = isObject(object) && Object.keys(object);
+    if (!objPropertyNames || !objPropertyNames.length) {
+      throw `State Machine: Context: Invalid object "${JSON.stringify(
+        object ?? {}
+      )}": incorrect format`;
+    }
+
+    return objPropertyNames;
+  };
 
   //public functions
   const has = (...names) => {

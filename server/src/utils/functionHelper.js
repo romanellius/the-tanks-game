@@ -15,7 +15,13 @@ const makeChainable = (functionObject) => {
   return functionObject;
 };
 
-const wrapWithErrorHandler = (functionObject, errorHandler = () => {}) => {
+const wrapWithErrorHandler = (functionObject, errorHandler) => {
+  if (typeof errorHandler !== "function") {
+    throw `Cannot wrap the function with handler "${JSON.stringify(
+      errorHandler
+    )}"`;
+  }
+
   for (const name in functionObject) {
     if (typeof functionObject[name] === "function") {
       const func = functionObject[name];

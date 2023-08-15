@@ -1,17 +1,16 @@
 ///FUNCTION Helper///
 
-const makeChainable = (functionObject) => {
-  for (const name in functionObject) {
-    if (typeof functionObject[name] === "function") {
-      const func = functionObject[name];
+const forEach = require("lodash.foreach");
 
+const makeChainable = (functionObject) => {
+  forEach(functionObject, (func, name) => {
+    if (typeof func === "function") {
       functionObject[name] = function (...props) {
         func(...props);
         return this;
       };
     }
-  }
-
+  });
   return functionObject;
 };
 
@@ -22,11 +21,9 @@ const wrapWithErrorHandler = (functionObject, errorHandler) => {
     )}"`;
   }
 
-  for (const name in functionObject) {
-    if (typeof functionObject[name] === "function") {
-      const func = functionObject[name];
-
-      functionObject[name] = (...props) => {
+  forEach(functionObject, (func, name) => {
+    if (typeof func === "function") {
+      functionObject[name] = function (...props) {
         try {
           func(...props);
         } catch (error) {
@@ -34,7 +31,7 @@ const wrapWithErrorHandler = (functionObject, errorHandler) => {
         }
       };
     }
-  }
+  });
 
   return functionObject;
 };

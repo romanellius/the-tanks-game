@@ -1,32 +1,39 @@
-const { isObject, createClone } =
-  require("../../../../shared").utils.objectHelper;
+/// Shareable Between States CONTEXT ///
+
+const isPlainObject = require("lodash.isplainobject");
+const { createClone } = require("../../../../shared").utils.objectHelper;
 
 module.exports = () => {
   //init
   const context = {};
 
   //private functions
-  const processNames = (names) => {
+  const processNames = (spreadNames) => {
     //[ ["var1", "var2"] ]
-    if (Array.isArray(names[0])) {
-      return names[0];
+    if (Array.isArray(spreadNames[0])) {
+      return spreadNames[0];
     }
+
     //[ { var1, var2 } ]
-    if (isObject(names[0])) {
-      return Object.keys(names[0]);
+    if (isPlainObject(spreadNames[0])) {
+      return Object.keys(spreadNames[0]);
     }
+
     //[ "var1", "var2" ]
-    return names;
+    if (typeof spreadNames[0] === "string") {
+      return spreadNames;
+    }
+
+    return [];
   };
 
-  const filterProperties = (target, source, checkExistence) => {
-    return source.filter(
-      (value) => checkExistence === target.hasOwnProperty(value)
-    );
-  };
+  const pickExistingProperties = (target, source) =>
+    source.filter((value) => target.hasOwnProperty(value));
+  const omitExistingProperties = (target, source) =>
+    source.filter((value) => !target.hasOwnProperty(value));
 
   const getPropertyNames = (object) => {
-    const objPropertyNames = isObject(object) && Object.keys(object);
+    const objPropertyNames = isPlainObject(object) && Object.keys(object);
     if (!objPropertyNames || !objPropertyNames.length) {
       throw `State Machine: Context: Invalid object "${JSON.stringify(
         object ?? {}
@@ -43,7 +50,7 @@ module.exports = () => {
       throw "State Machine: Context: Can not iterate empty list: incorrect format";
     }
 
-    const notExistingNames = filterProperties(context, names, false);
+    const notExistingNames = omitExistingProperties(context, names);
     //returns 'true' if all names exist, 'array of not existing names' otherwise
     return notExistingNames.length ? notExistingNames : true;
   };
@@ -51,7 +58,7 @@ module.exports = () => {
   const add = (object) => {
     const objPropertyNames = getPropertyNames(object);
 
-    const existingKeys = filterProperties(context, objPropertyNames, true);
+    const existingKeys = pickExistingProperties(context, objPropertyNames);
     if (existingKeys.length) {
       throw `State Machine: Context: Can not add "${JSON.stringify(
         existingKeys
@@ -64,7 +71,7 @@ module.exports = () => {
   const update = (object) => {
     const objPropertyNames = getPropertyNames(object);
 
-    const notExistingKeys = filterProperties(context, objPropertyNames, false);
+    const notExistingKeys = omitExistingProperties(context, objPropertyNames);
     if (notExistingKeys.length) {
       throw `State Machine: Context: Can not update "${JSON.stringify(
         notExistingKeys
@@ -80,7 +87,7 @@ module.exports = () => {
       throw "State Machine: Context: Can not remove empty list: incorrect format";
     }
 
-    const notExistingNames = filterProperties(context, names, false);
+    const notExistingNames = omitExistingProperties(context, names);
     if (notExistingNames.length) {
       throw `State Machine: Context: Can not remove "${JSON.stringify(
         notExistingNames

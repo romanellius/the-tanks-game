@@ -45,19 +45,9 @@ const cloningReadOnlyProxyHandler = {
 };
 
 //public functions
-const isObject = (value) => {
-  return (
-    value &&
-    typeof value === "object" &&
-    typeof value !== "function" &&
-    !Array.isArray(value)
-  );
-};
-
 const createSafeClone = (object) =>
   new Proxy(object, cloningReadOnlyProxyHandler);
 
 module.exports = {
-  isObject,
   createClone: createSafeClone,
 };

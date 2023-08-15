@@ -26,12 +26,11 @@ const checkCapture = (address, position) => {
 };
 
 const checkKill = (address, position) => {
-  const isKilled =
-    getDistance(
-      position,
-      localWorldState.players.get(localWorldState.players.get(address).enemy)
-        .position
-    ) <= 0.5;
+  const enemyPosition = localWorldState.players.get(
+    localWorldState.players.get(address).enemy
+  ).position;
+
+  const isKilled = getDistance(position, enemyPosition) <= 0.5;
   if (isKilled) {
     localWorldState.killer = address;
     server.stateTransitionTo("next");

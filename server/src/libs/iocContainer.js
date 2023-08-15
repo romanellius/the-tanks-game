@@ -1,7 +1,8 @@
 ///IOC CONTAINER///
 
+const isPlainObject = require("lodash.isplainobject");
+const forEach = require("lodash.foreach");
 const { resolvePath } = require("../../../shared").utils.fileHelper;
-const { isObject } = require("../../../shared").utils.objectHelper;
 const configObject = require("../iocConfig");
 
 //init
@@ -10,13 +11,12 @@ build(container, configObject);
 
 //private functions
 function validateConfiguration(configObject) {
-  if (!isObject(configObject)) {
+  if (!isPlainObject(configObject)) {
     throw "IoC Container: 'dependencies.js' must export an object";
   }
 
-  for (const dependencyName in configObject) {
-    const dependency = configObject[dependencyName];
-    if (!isObject(dependency)) {
+  forEach(configObject, (dependency) => {
+    if (!isPlainObject(dependency)) {
       throw "IoC Container: each dependency must be an object in 'dependencies.js'";
     }
 
@@ -40,7 +40,7 @@ function validateConfiguration(configObject) {
         }
       });
     }
-  }
+  });
 }
 
 function registerDependency(
@@ -58,9 +58,8 @@ function registerDependency(
 }
 
 function bindConfiguration(container, configObject) {
-  for (const dependencyName in configObject) {
-    const { handler, dependencies, isSingleton, path } =
-      configObject[dependencyName];
+  forEach(configObject, (dependency, dependencyName) => {
+    const { handler, dependencies, isSingleton, path } = dependency;
 
     let newHandler = handler;
     if (typeof handler === "function") {
@@ -74,7 +73,7 @@ function bindConfiguration(container, configObject) {
       newHandler,
       !!isSingleton
     );
-  }
+  });
 }
 
 function build(container, configObject) {

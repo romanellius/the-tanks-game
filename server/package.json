@@ -8,5 +8,13 @@
     "devTest": "node src/_mainWithNoStateMachine.js"
   },
   "author": "RAM",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "lodash.attempt": "^4.2.0",
+    "lodash.compact": "^3.0.1",
+    "lodash.foreach": "^4.5.0",
+    "lodash.iserror": "^3.1.1",
+    "lodash.isplainobject": "^4.0.6",
+    "lodash.times": "^4.3.2"
+  }
 }

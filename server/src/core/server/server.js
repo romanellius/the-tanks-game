@@ -1,5 +1,7 @@
 ///SERVER///
 
+const attempt = require("lodash.attempt");
+const isError = require("lodash.iserror");
 const { resolve } = require("../../libs/iocContainer");
 
 module.exports = (
@@ -30,8 +32,9 @@ module.exports = (
           );*/
 
     try {
-      const data = JSON.parse(buffer.toString());
-      if (!data?.action) throw "Router: Can not handle empty route";
+      const data = attempt(JSON.parse, buffer.toString());
+      if (isError(data) || !data?.action)
+        throw "Router: Can not handle empty route";
       return data;
     } catch (error) {
       console.error(`Error: ${error}`);

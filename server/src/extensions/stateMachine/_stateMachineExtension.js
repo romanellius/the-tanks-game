@@ -1,5 +1,10 @@
 ///"STATE MACHINE" Supports Two "State STRUCTURES": FOLDERS and FILES///
 
+const attempt = require("lodash.attempt");
+const isError = require("lodash.iserror");
+const forEach = require("lodash.foreach");
+const isPlainObject = require("lodash.isplainobject");
+const compact = require("lodash.compact");
 const {
   getFolders,
   getMatchingFileAbsPath,
@@ -7,9 +12,7 @@ const {
   getFile,
   getFileNameWithNoExtension,
 } = require("../../../../shared").utils.fileHelper;
-const { isObject } = require("../../../../shared").utils.objectHelper;
 const iocContainer = require("../../libs/iocContainer");
-
 const createContext = require("./context");
 
 //init
@@ -49,14 +52,13 @@ const registerStateRouter = (server, path) => {
 };
 
 const bindServerProps = (frameworkInterface) => {
-  for (const propName in runtimeServerProps) {
-    frameworkInterface[propName] = runtimeServerProps[propName];
-  }
+  Object.assign(frameworkInterface, runtimeServerProps);
 };
 
 const getStateConfig = () => {
   const stateConfigJson = getFile("./src/stateConfig.json");
-  return JSON.parse(stateConfigJson);
+  const parsedStateConfig = attempt(JSON.parse, stateConfigJson);
+  return !isError(parsedStateConfig) ? parsedStateConfig : {};
 };
 
 const getStateDataFromFolderStructure = (frameworkInterface, stateFolders) => {
@@ -83,23 +85,19 @@ const getStateDataFromFolderStructure = (frameworkInterface, stateFolders) => {
 };
 
 const getStateDataFromFileStructure = (frameworkInterface, path) => {
-  const stateData = [];
-
-  for (const file of getAllFiles(path)) {
+  return getAllFiles(path).map((file) => {
     const { handler, disposeHandler } = require(file.absPath)({
       server: frameworkInterface,
       iocContainer,
       context: stateContext,
     });
 
-    stateData.push({
+    return {
       name: getFileNameWithNoExtension(file.name),
       handler,
       disposeHandler,
-    });
-  }
-
-  return stateData;
+    };
+  });
 };
 
 const getStateData = (frameworkInterface) => {
@@ -125,21 +123,20 @@ const validateConfiguration = (stateConfig, stateData) => {
     };
   });
 
-  for (const stateName in stateConfig) {
+  forEach(stateConfig, (state, stateName) => {
     stateName.startsWith("@") && initStatesCount++;
 
-    eachFromStateIsValid &&= isObject(stateConfig[stateName]);
-    if (!eachFromStateIsValid) break;
+    eachFromStateIsValid &&= isPlainObject(state);
+    if (!eachFromStateIsValid) return false;
 
-    for (const input in stateConfig[stateName]) {
-      eachToStateExists &&= stateConfig[stateConfig[stateName][input]];
-    }
+    forEach(state, (toState) => {
+      eachToStateExists &&= !!stateConfig[toState];
+    });
 
-    eachStateHasHandler &&=
-      stateHandlers[stateName] && !!stateHandlers[stateName].handler;
-  }
+    eachStateHasHandler &&= !!stateHandlers[stateName]?.handler;
+  });
 
-  const exceptions = [
+  const exceptions = compact([
     initStatesCount !== 1 &&
       `StateMachine: initial state must be only one: found ${initStatesCount} initial states`,
     !eachFromStateIsValid &&
@@ -148,7 +145,7 @@ const validateConfiguration = (stateConfig, stateData) => {
       "StateMachine: at least one 'stateTo' in 'states.json' doesn't exist",
     !eachStateHasHandler &&
       "StateMachine: each state must have corresponding state and handler in 'states/'",
-  ].filter(Boolean);
+  ]);
 
   if (exceptions.length) {
     throw exceptions;
@@ -156,13 +153,15 @@ const validateConfiguration = (stateConfig, stateData) => {
 };
 
 const bindStateConditions = (stateConfig) => {
-  for (const stateName in stateConfig) {
-    stateName.startsWith("@") && (initState = stateName);
+  forEach(stateConfig, (state, stateName) => {
+    if (stateName.startsWith("@")) {
+      initState = stateName;
+    }
 
     states[stateName] = Object.assign(states[stateName] ?? {}, {
-      conditions: stateConfig[stateName],
+      conditions: state,
     });
-  }
+  });
 };
 
 const bindStateHandlers = (stateData) => {

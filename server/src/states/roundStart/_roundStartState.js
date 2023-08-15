@@ -1,3 +1,6 @@
+const times = require("lodash.times");
+const forEach = require("lodash.foreach");
+
 let roundNumber = 0;
 const roundStartDelay = 1_000; //3_000;
 
@@ -18,11 +21,11 @@ const generateWorld = (server) => {
     "4:1": { type: "brick", health: maxBrickHealth },
   };
 
-  const map = [...Array(size)].map((_) => Array(size).fill(""));
-  for (const [key, value] of Object.entries(mapConfig)) {
+  const map = times(size, () => Array(size).fill(""));
+  forEach(mapConfig, (value, key) => {
     const [i, j] = key.split(":");
     map[i][j] = value;
-  }
+  });
 
   const flag = { x: 2, y: 2 };
 

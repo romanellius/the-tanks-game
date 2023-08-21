@@ -1,5 +1,3 @@
-///OBJECT Helper///
-
 const cloneDeep = require("lodash.clonedeep");
 
 //private functions

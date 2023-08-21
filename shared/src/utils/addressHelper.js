@@ -1,5 +1,4 @@
-///IPv4 Helper///
-
+//public functions
 const toString = (ipAddress) => `${ipAddress.address}:${ipAddress.port}`;
 
 module.exports = {

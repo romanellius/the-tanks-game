@@ -1,7 +1,7 @@
 {
-  "name": "multiplayercommon",
+  "name": "tanks_2023_shared",
   "version": "1.0.0",
-  "description": "",
+  "description": "Shared utils and const for the 'project_tanks_2023'",
   "main": "src/index.js",
   "scripts": {},
   "author": "RAM",

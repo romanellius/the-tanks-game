@@ -1,8 +1,7 @@
-///FILE Helper///
-
 const fs = require("fs");
 const { resolve, join, parse } = require("path");
 
+//public functions
 const joinPaths = (...paths) => join(...paths);
 const resolvePath = (path) => resolve(path);
 

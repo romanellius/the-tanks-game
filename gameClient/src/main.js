@@ -67,7 +67,7 @@ client.on("connect", () => {
   // catches "kill pid"
   process.on("SIGUSR2", exitHandler({ exit: true }));
   //catches uncaught exceptions
-  process.on("uncaughtException", exitHandler({ exit: true }));
+  process.on("uncaughtException", (error, origin) => exitHandler({ error, exit: true }));
   */
 
   /*

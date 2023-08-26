@@ -43,6 +43,11 @@ client.on("connect", () => {
 
   /*
   ///
+  /**
+  * Do stuff and exit the process
+  * @param {NodeJS.SignalsListener} signal
+  */
+  /*
   function exitHandler(options, exitCode) {
     client.send(
       Buffer.from(JSON.stringify({ action: "disconnect" })),
@@ -52,15 +57,17 @@ client.on("connect", () => {
     );
   }
   //app is closing
-  process.on("exit", exitHandler.bind(null, { cleanup: true }));
+  process.on("exit", exitHandler({ cleanup: true }));
   //catches ctrl+c event
-  process.on("SIGINT", exitHandler.bind(null, { exit: true }));
+  process.on("SIGINT", exitHandler({ exit: true }));
+  process.on('SIGTERM', exitHandler({ exit: true }))
+  process.on('SIGQUIT', exitHandler({ exit: true }))
   // catches "kill pid"
-  process.on("SIGUSR1", exitHandler.bind(null, { exit: true }));
+  process.on("SIGUSR1", exitHandler({ exit: true }));
   // catches "kill pid"
-  process.on("SIGUSR2", exitHandler.bind(null, { exit: true }));
+  process.on("SIGUSR2", exitHandler({ exit: true }));
   //catches uncaught exceptions
-  process.on("uncaughtException", exitHandler.bind(null, { exit: true }));
+  process.on("uncaughtException", exitHandler({ exit: true }));
   */
 
   /*

@@ -17,21 +17,21 @@ app
     console.log(`Server running on ${ip}:${port} (${type})\n`);
   })
   .useStateMachine(/^\/api/)
-  .bindEndpoint(/^\//, (data, _, next) => {
+  .bindEndpoint(/^\//, ({ data }, next) => {
     console.log(`Logger: ${data?.action}`);
     next();
   })
-  .addErrorHandler((error, data) => {
+  .addErrorHandler((error, { data }) => {
     console.error(`Error: Route ${data?.action} throws error: ${error}`);
   });
 
 //request not handled properly
 app
   .bindRouter(/^\//)
-  .bindEndpoint(null, (data) => {
+  .bindEndpoint(null, ({ data }) => {
     console.error(`Warning: Route ${data?.action} is not handled`);
   })
-  .addErrorHandler((error, _data, _remote, next) => {
+  .addErrorHandler((error, _, next) => {
     next(error);
   });
 

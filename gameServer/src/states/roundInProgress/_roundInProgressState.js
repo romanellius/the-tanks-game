@@ -200,7 +200,7 @@ module.exports = (framework) => {
       const { worldState } = useContext();
       localWorldState = worldState;
 
-      router.bindEndpoint(endpoints.update, (data, remote) => {
+      router.bindEndpoint(endpoints.update, ({ data, remote }) => {
         const address = flattenAddress(remote);
 
         if (clientsData.has(address)) {

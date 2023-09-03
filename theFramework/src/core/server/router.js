@@ -95,7 +95,7 @@ module.exports = (isRoutePatternDynamic, pattern) => {
       const doInvokeNextHandler = !doSkip && !handlerResult.done;
       if (doInvokeNextHandler) {
         const handler = handlerResult.value;
-        handler(data, remote, invokeNextHandler, server);
+        handler({ data, remote }, invokeNextHandler, server);
       } else {
         isInvocationChainFinished = false;
       }
@@ -124,8 +124,10 @@ module.exports = (isRoutePatternDynamic, pattern) => {
         try {
           errorHandlers[errorHandlerIndex++](
             error,
-            data,
-            remote,
+            {
+              data,
+              remote,
+            },
             invokeNextErrorHandler,
             server
           );

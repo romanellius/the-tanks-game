@@ -8,13 +8,13 @@ module.exports = ({ server }) => {
     handler: (router) => {
       server.clearClients();
 
-      router.addErrorHandler((error, data) => {
+      router.addErrorHandler((error, { data }) => {
         console.error(
           `Error: Route ${data?.action} throws error:\n${error?.stack}`
         );
       });
 
-      router.bindEndpoint(endpoints.join, (_, remote) => {
+      router.bindEndpoint(endpoints.join, ({ remote }) => {
         server.connectClient(
           remote,
           () =>
@@ -25,7 +25,7 @@ module.exports = ({ server }) => {
         );
       });
 
-      router.bindEndpoint(endpoints.leave, (_, remote) => {
+      router.bindEndpoint(endpoints.leave, ({ remote }) => {
         server.disconnectClient(remote);
       });
     },

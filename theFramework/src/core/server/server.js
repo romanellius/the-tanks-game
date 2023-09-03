@@ -9,8 +9,7 @@ module.exports = (
   clients,
   defaultRouter,
   initCallbacks,
-  { makeChainable },
-  socketConfig
+  { makeChainable }
 ) => {
   //init
   const routers = [defaultRouter];
@@ -106,13 +105,14 @@ module.exports = (
     });
   };
 
-  const initSocket = (socket, onReceive, onRun) => {
+  const initSocket = (socket, onReceive, onRun, { type, port }) => {
     socket
+      .init(type)
       .onReceive(onReceive)
       .onRun(onRun)
       .onError()
       .onTerminate()
-      .run(socketConfig);
+      .run(port);
   };
 
   //public functions
@@ -144,9 +144,9 @@ module.exports = (
   const bindEndpoint = (route, handler) => defaultRouter.bind(route, handler);
   const addErrorHandler = (handler) => defaultRouter.onError(handler);
 
-  const run = () => {
+  const run = (config) => {
     setDefaultErrorHandler(defaultRouter);
-    initSocket(socket, resolveMessage, invokeRunCallbacks);
+    initSocket(socket, resolveMessage, invokeRunCallbacks, config);
   };
   const onRun = (callback) => initCallbacks.onRun.add(callback);
   const onRunExtensions = (callbacks) =>

@@ -11,4 +11,9 @@ module.exports = {
     handler: () => require("../../shared").utils.addressHelper.toString,
     isSingleton: true,
   },
+
+  config: {
+    handler: () => require("../../shared").constants.SERVER_CONFIG,
+    isSingleton: true,
+  },
 };

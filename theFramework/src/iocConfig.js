@@ -13,14 +13,13 @@ module.exports = {
     dependencies: ["helpers/fileHelper"],
   },
   "core/server/server": {
-    handler: (protocol, clients, router, callbacks, functionHelper, config) =>
+    handler: (protocol, clients, router, callbacks, functionHelper) =>
       require("./core/server/server")(
         protocol,
         clients,
         router,
         callbacks,
-        functionHelper,
-        config
+        functionHelper
       ),
     dependencies: [
       "core/server/protocols/udp",
@@ -28,7 +27,6 @@ module.exports = {
       "core/server/router",
       "core/server/initCallbacks",
       "helpers/functionHelper",
-      "config",
     ],
   },
   "core/server/clients": {
@@ -45,8 +43,7 @@ module.exports = {
     dependencies: ["helpers/isRoutePatternDynamic"],
   },
   "core/server/protocols/udp": {
-    handler: (config) => require("./core/server/protocols/udp")(config),
-    dependencies: ["config"],
+    handler: () => require("./core/server/protocols/udp")(),
   },
 
   "helpers/functionHelper": {
@@ -63,11 +60,6 @@ module.exports = {
   },
   "helpers/flattenAddress": {
     handler: () => require("../../shared").utils.addressHelper.toString,
-    isSingleton: true,
-  },
-
-  config: {
-    handler: () => require("../../shared").constants.SERVER_CONFIG,
     isSingleton: true,
   },
 };

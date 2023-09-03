@@ -7,8 +7,9 @@
 
 const { resolve } = require("./libs/iocContainer");
 
-const appBuilder = resolve("theFramework");
-const app = appBuilder.build();
+const config = resolve("config");
+const theFramework = resolve("theFramework");
+const app = theFramework(config);
 
 app
   .onRun(({ address }) => {

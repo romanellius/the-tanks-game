@@ -44,16 +44,14 @@ module.exports = (
     bindConfigHandlers(props, configHandlers);
   };
 
-  return {
-    build: (doSupportExtensions = true) => {
-      doSupportExtensions && buildExtensions();
+  return (config, doSupportExtensions = true) => {
+    doSupportExtensions && buildExtensions();
 
-      return {
-        run,
-        bindRouter,
+    return {
+      run: () => run(config),
+      bindRouter,
 
-        ...props,
-      };
-    },
+      ...props,
+    };
   };
 };

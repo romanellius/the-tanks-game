@@ -1,0 +1,31 @@
+{
+  "name": "tanks_2023_server",
+  "version": "1.0.0",
+  "description": "Tanks 2023 server.\n",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "node src/main.js",
+    "devTest": "node src/_mainWithNoStateMachine.js"
+  },
+  "keywords": [
+    "tanks",
+    "tanks1990",
+    "server",
+    "game",
+    "game-server",
+    "multiplayer",
+    "multiplayer-game-server",
+    "online",
+    "realtime"
+  ],
+  "author": "RAM",
+  "license": "ISC",
+  "dependencies": {
+    "lodash.attempt": "^4.2.0",
+    "lodash.compact": "^3.0.1",
+    "lodash.foreach": "^4.5.0",
+    "lodash.iserror": "^3.1.1",
+    "lodash.isplainobject": "^4.0.6",
+    "lodash.times": "^4.3.2"
+  }
+}

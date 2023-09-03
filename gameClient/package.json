@@ -2,7 +2,7 @@
   "name": "tanks_2023_client",
   "version": "1.0.0",
   "description": "Client for multiplayer replica of 'Tank 1990'",
-  "main": "app.js",
+  "main": "src/main.js",
   "scripts": {
     "dev": "node src/main.js"
   },

@@ -1,0 +1,35 @@
+{
+  "name": "the_framework",
+  "version": "1.0.0",
+  "description": "Fast, efficient and scalable framework for development of multiplayer online games.\n",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "framework",
+    "nodejs",
+    "scalable",
+    "networking",
+    "server",
+    "game",
+    "game-server",
+    "gamedev",
+    "game-development",
+    "multiplayer",
+    "multiplayer-game-server",
+    "online",
+    "realtime",
+    "socket",
+    "udp"
+  ],
+  "author": "RAM",
+  "license": "ISC",
+  "dependencies": {
+    "lodash.attempt": "^4.2.0",
+    "lodash.foreach": "^4.5.0",
+    "lodash.iserror": "^3.1.1",
+    "lodash.isplainobject": "^4.0.6"
+  }
+}

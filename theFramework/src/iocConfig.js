@@ -1,8 +1,7 @@
 module.exports = {
   "core/framework": {
-    path: "./core/framework",
-    handler: (path, server, extensions, functionHelper) =>
-      require(path)(server, extensions, functionHelper),
+    handler: (server, extensions, functionHelper) =>
+      require("./core/framework")(server, extensions, functionHelper),
     dependencies: [
       "core/server/server",
       "core/useExtensions",
@@ -10,22 +9,13 @@ module.exports = {
     ],
   },
   "core/useExtensions": {
-    path: "./core/useExtensions",
-    handler: (path, server, fileHelper) => require(path)(server, fileHelper),
+    handler: (server, fileHelper) =>
+      require("./core/useExtensions")(server, fileHelper),
     dependencies: ["core/server/server", "helpers/fileHelper"],
   },
   "core/server/server": {
-    path: "./core/server/server",
-    handler: (
-      path,
-      protocol,
-      clients,
-      router,
-      callbacks,
-      functionHelper,
-      config
-    ) =>
-      require(path)(
+    handler: (protocol, clients, router, callbacks, functionHelper, config) =>
+      require("./core/server/server")(
         protocol,
         clients,
         router,
@@ -44,45 +34,37 @@ module.exports = {
     isSingleton: true,
   },
   "core/server/clients": {
-    path: "./core/server/clients",
-    handler: (path, flattenAddress) => require(path)(flattenAddress),
+    handler: (flattenAddress) =>
+      require("./core/server/clients")(flattenAddress),
     dependencies: ["helpers/flattenAddress"],
   },
   "core/server/initCallbacks": {
-    path: "./core/server/initCallbacks",
-    handler: (path) => require(path)(),
+    handler: () => require("./core/server/initCallbacks")(),
   },
   "core/server/router": {
-    path: "./core/server/router",
-    handler: (path, isRoutePatternDynamic, rootPattern) =>
-      require(path)(isRoutePatternDynamic, rootPattern),
+    handler: (isRoutePatternDynamic, rootPattern) =>
+      require("./core/server/router")(isRoutePatternDynamic, rootPattern),
     dependencies: ["helpers/isRoutePatternDynamic"],
   },
   "core/server/protocols/udp": {
-    path: "./core/server/protocols/udp",
-    handler: (path, config) => require(path)(config),
+    handler: (config) => require("./core/server/protocols/udp")(config),
     dependencies: ["config"],
   },
 
   "helpers/functionHelper": {
-    path: "./utils/functionHelper",
-    handler: (path) => require(path),
+    handler: () => require("./utils/functionHelper"),
   },
   "helpers/isRoutePatternDynamic": {
-    path: "./utils/regexpHelper",
-    handler: (path) => require(path).isRegExp,
+    handler: () => require("./utils/regexpHelper").isRegExp,
   },
   "helpers/fileHelper": {
-    path: "../../shared",
-    handler: (path) => require(path).utils.fileHelper,
+    handler: () => require("../../shared").utils.fileHelper,
   },
   "helpers/flattenAddress": {
-    path: "../../shared",
-    handler: (path) => require(path).utils.addressHelper.toString,
+    handler: () => require("../../shared").utils.addressHelper.toString,
   },
 
   config: {
-    path: "../../shared",
-    handler: (path) => require(path).constants.SERVER_CONFIG,
+    handler: () => require("../../shared").constants.SERVER_CONFIG,
   },
 };

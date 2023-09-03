@@ -1,15 +1,12 @@
 module.exports = {
   theFramework: {
-    path: "../../theFramework",
-    handler: (path) => require(path),
+    handler: () => require("../../theFramework"),
   },
 
   "helpers/stringifyWithMap": {
-    path: "./utils/jsonHelper",
-    handler: (path) => require(path).stringifyWithMapDataType,
+    handler: () => require("./utils/jsonHelper").stringifyWithMapDataType,
   },
   "helpers/flattenAddress": {
-    path: "../../shared",
-    handler: (path) => require(path).utils.addressHelper.toString,
+    handler: () => require("../../shared").utils.addressHelper.toString,
   },
 };

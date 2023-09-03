@@ -62,7 +62,7 @@ function bindConfiguration(container, configObject) {
 
     let newHandler = handler;
     if (typeof handler === "function") {
-      newHandler = (...props) => handler(path, ...props);
+      newHandler = (...props) => handler(...props);
     }
 
     registerDependency(

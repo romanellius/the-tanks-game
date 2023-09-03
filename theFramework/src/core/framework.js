@@ -2,7 +2,7 @@
 
 module.exports = (
   server,
-  extensions,
+  useExtensions,
   { makeChainable, wrapWithErrorHandler }
 ) => {
   //init
@@ -38,7 +38,7 @@ module.exports = (
   };
 
   const buildExtensions = () => {
-    const { runHandlers, configHandlers } = extensions;
+    const { runHandlers, configHandlers } = useExtensions(server);
 
     bindRunHandlers(runHandlers, onRunExtensions);
     bindConfigHandlers(props, configHandlers);

@@ -1,7 +1,6 @@
 ///ENTRY POINT///
 
 //TODO: Move out
-//        [x] Core(+ function' and regexp' helpers from /utils) to 'Framework'
 //        [ ] and Extensions to separate projects(stateConfig.json, change file-based logic and pass iocContainer?)
 //        [ ] IocContainer(separate iocConfig),
 //TODO: Add built-in support for different IoC Containers

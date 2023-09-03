@@ -4,7 +4,23 @@ const configObject = require("../iocConfig");
 
 //init
 const container = {};
-const currentResolvingDependencies = new Set();
+
+//circular referencing check
+const { add: addToStack, remove: removeFromStack } = (() => {
+  const dependencies = new Set();
+
+  return {
+    add: (value) => {
+      if (dependencies.has(value)) {
+        throw `IoC Container: Can not resolve '${value}' dependency: circular referencing`;
+      }
+      dependencies.add(value);
+    },
+    remove: (value) => {
+      dependencies.delete(value);
+    },
+  };
+})();
 
 build(container, configObject);
 
@@ -91,10 +107,7 @@ const registerSingleton = function (name, handler, argDependencies = []) {
 };
 
 const resolve = (name, ...props) => {
-  if (currentResolvingDependencies.has(name)) {
-    throw `IoC Container: Can not resolve '${name}' dependency: circular referencing`;
-  }
-  currentResolvingDependencies.add(name);
+  addToStack(name);
 
   const dependency = container[name];
   if (!dependency) {
@@ -102,9 +115,13 @@ const resolve = (name, ...props) => {
   }
 
   const { isSingleton, handler, argDependencies, instance } = dependency;
-  if (typeof handler !== "function") return handler;
+  if (typeof handler !== "function") {
+    removeFromStack(name);
+    return handler;
+  }
 
   if (isSingleton && instance) {
+    removeFromStack(name);
     return instance;
   }
 
@@ -116,7 +133,7 @@ const resolve = (name, ...props) => {
     dependency.instance = newInstance;
   }
 
-  currentResolvingDependencies.delete(name);
+  removeFromStack(name);
   return newInstance;
 };
 

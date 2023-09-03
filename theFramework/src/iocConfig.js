@@ -9,9 +9,8 @@ module.exports = {
     ],
   },
   "core/useExtensions": {
-    handler: (server, fileHelper) =>
-      require("./core/useExtensions")(server, fileHelper),
-    dependencies: ["core/server/server", "helpers/fileHelper"],
+    handler: (fileHelper) => require("./core/useExtensions")(fileHelper),
+    dependencies: ["helpers/fileHelper"],
   },
   "core/server/server": {
     handler: (protocol, clients, router, callbacks, functionHelper, config) =>
@@ -31,7 +30,6 @@ module.exports = {
       "helpers/functionHelper",
       "config",
     ],
-    isSingleton: true,
   },
   "core/server/clients": {
     handler: (flattenAddress) =>
@@ -53,18 +51,23 @@ module.exports = {
 
   "helpers/functionHelper": {
     handler: () => require("./utils/functionHelper"),
+    isSingleton: true,
   },
   "helpers/isRoutePatternDynamic": {
     handler: () => require("./utils/regexpHelper").isRegExp,
+    isSingleton: true,
   },
   "helpers/fileHelper": {
     handler: () => require("../../shared").utils.fileHelper,
+    isSingleton: true,
   },
   "helpers/flattenAddress": {
     handler: () => require("../../shared").utils.addressHelper.toString,
+    isSingleton: true,
   },
 
   config: {
     handler: () => require("../../shared").constants.SERVER_CONFIG,
+    isSingleton: true,
   },
 };

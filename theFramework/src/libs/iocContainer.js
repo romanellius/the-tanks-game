@@ -74,18 +74,13 @@ function registerDependency(
 
 function bindConfiguration(container, configObject) {
   forEach(configObject, (dependency, dependencyName) => {
-    const { handler, dependencies, isSingleton, path } = dependency;
-
-    let newHandler = handler;
-    if (typeof handler === "function") {
-      newHandler = (...props) => handler(...props);
-    }
+    const { handler, dependencies, isSingleton } = dependency;
 
     registerDependency(
       container,
       dependencyName,
       dependencies ?? [],
-      newHandler,
+      handler,
       !!isSingleton
     );
   });

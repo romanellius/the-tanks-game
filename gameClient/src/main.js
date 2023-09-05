@@ -1,11 +1,10 @@
 const udp = require("dgram");
 const { Buffer } = require("buffer");
-const {
-  constants: {
-    SERVER_CONFIG: { ip, port, type },
-    /*MTU:{ mtu_recommended_size, mtu_size_warning },*/
-  },
-} = require("../../shared");
+const { port: defaultPort, type } =
+  require("../../shared").constants.SERVER_CONFIG;
+
+const port = process.argv[2];
+console.log(port);
 
 const client = udp.createSocket(type);
 
@@ -164,7 +163,7 @@ client.on("message", (buffer, remote) => {
   */
 });
 
-client.connect(port);
+client.connect(port ?? defaultPort);
 
 //wait for active world state
 //remember own inputs

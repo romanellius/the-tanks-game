@@ -4,8 +4,8 @@ const { resolve } = require("./libs/iocContainer");
 
 const flattenAddress = resolve("helpers/flattenAddress");
 const config = resolve("config");
-
 const theFramework = resolve("theFramework");
+
 const app = theFramework(config, false);
 
 app
@@ -72,25 +72,23 @@ app.bindRouter(/^\//).bindEndpoint(null, ({ data }) => {
 app.run();
 
 //second framework instance
-// const theFramework2 = resolve("theFramework");
-// const app2 = theFramework2(
-//   {
-//     port: 5555,
-//     type: "udp4",
-//   },
-//   false
-// );
+const app2 = theFramework(
+  {
+    port: 5555,
+    type: "udp4",
+  },
+  false
+);
 
-// app2
-//   .onRun(({ address }) => {
-//     const { ip, port, type } = address;
-//     console.log(`Server2 running on ${ip}:${port} (${type})\n`);
-//   })
-//   .bindEndpoint(null, ({ data }) => {
-//     console.log(`Logger2: ${data?.action}`);
-//   })
-//   .addErrorHandler((error, { data }) => {
-//     console.error(`Error2: Route ${data?.action} throws error: ${error}`);
-//   });
-
-// app2.run();
+app2
+  .onRun(({ address }) => {
+    const { ip, port, type } = address;
+    console.log(`Server2 running on ${ip}:${port} (${type})\n`);
+  })
+  .bindEndpoint(null, ({ data }) => {
+    console.log(`Logger2: ${data?.action}`);
+  })
+  .addErrorHandler((error, { data }) => {
+    console.error(`Error2: Route ${data?.action} throws error: ${error}`);
+  })
+  .run();

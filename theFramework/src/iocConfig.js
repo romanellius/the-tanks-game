@@ -1,7 +1,19 @@
 module.exports = {
   "core/framework": {
-    handler: (server, extensions, functionHelper) =>
-      require("./core/framework")(server, extensions, functionHelper),
+    handler: (
+      server,
+      extensions,
+      functionHelper,
+      doSupportExtensions,
+      config
+    ) =>
+      require("./core/framework")(
+        server,
+        extensions,
+        functionHelper,
+        doSupportExtensions,
+        config
+      ),
     dependencies: [
       "core/server/server",
       "core/useExtensions",

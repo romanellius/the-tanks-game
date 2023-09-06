@@ -4,7 +4,6 @@ const { port: defaultPort, type } =
   require("../../shared").constants.SERVER_CONFIG;
 
 const port = process.argv[2];
-console.log(port);
 
 const client = udp.createSocket(type);
 

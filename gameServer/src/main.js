@@ -1,15 +1,11 @@
 ///ENTRY POINT///
 
-//TODO: Move out IocContainer,
-//TODO: Add built-in support for different IoC Containers
-
-const { resolve } = require("./libs/iocContainer");
+const iocConfig = require("./iocConfig");
+const theStateMachine = require("../../theStateMachine");
+const { resolve } = require("../../theIocContainer")(iocConfig);
 
 const config = resolve("config");
-const theFramework = resolve("theFramework");
-const theStateMachine = resolve("theStateMachine");
-
-const app = theFramework(config);
+const app = resolve("theFramework", config);
 
 app
   .onRun(({ address }) => {

@@ -1,9 +1,6 @@
 module.exports = {
   theFramework: {
-    handler: () => require("../../theFramework"),
-  },
-  theStateMachine: {
-    handler: () => require("../../theStateMachine"),
+    handler: (_, config) => require("../../theFramework")(config),
   },
 
   config: {

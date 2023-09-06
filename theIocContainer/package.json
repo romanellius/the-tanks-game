@@ -1,0 +1,24 @@
+{
+  "name": "the_ioc_container",
+  "version": "1.0.0",
+  "description": "Easy to use and fast as fuck IoC Container with constructor injection, singleton support and circular referencing protection",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ioc",
+    "ioc-container",
+    "di",
+    "dip",
+    "injection",
+    "constructor-injection",
+    "singleton"
+  ],
+  "author": "RAM",
+  "license": "ISC",
+  "dependencies": {
+    "lodash.foreach": "^4.5.0",
+    "lodash.isplainobject": "^4.0.6"
+  }
+}

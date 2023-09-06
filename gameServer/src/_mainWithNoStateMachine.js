@@ -1,13 +1,12 @@
 ///ENTRY POINT///
 
-const { resolve } = require("./libs/iocContainer");
+const iocConfig = require("./iocConfig");
+const { resolve } = require("../../theIocContainer")(iocConfig);
 const { toString: flattenAddress } =
   require("../../shared").utils.addressHelper;
 
 const config = resolve("config");
-const theFramework = resolve("theFramework");
-
-const app = theFramework(config, false);
+const app = resolve("theFramework", config);
 
 app
   .onRun(({ address }) => {
@@ -73,13 +72,10 @@ app.bindRouter(/^\//).bindEndpoint(null, ({ data }) => {
 app.run();
 
 //second framework instance
-const app2 = theFramework(
-  {
-    port: 5555,
-    type: "udp4",
-  },
-  false
-);
+const app2 = resolve("theFramework", {
+  port: 5555,
+  type: "udp4",
+});
 
 app2
   .onRun(({ address }) => {

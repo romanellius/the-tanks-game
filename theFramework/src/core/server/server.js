@@ -2,14 +2,14 @@
 
 const attempt = require("lodash.attempt");
 const isError = require("lodash.iserror");
-const { resolve } = require("../../libs/iocContainer");
 
 module.exports = (
   socket,
   clients,
   defaultRouter,
   initCallbacks,
-  { makeChainable }
+  { makeChainable },
+  resolveDependency
 ) => {
   //init
   const routers = [defaultRouter];
@@ -129,7 +129,7 @@ module.exports = (
 
   //"rootPattern" must start with ["/](static pattern) or [/^\/](RegExp pattern)
   const bindRouter = (rootPattern) => {
-    const newRouter = resolve("core/server/router", rootPattern);
+    const newRouter = resolveDependency("core/server/router", rootPattern);
     routers.push(newRouter);
 
     return {
@@ -144,7 +144,7 @@ module.exports = (
   const bindEndpoint = (route, handler) => defaultRouter.bind(route, handler);
   const addErrorHandler = (handler) => defaultRouter.onError(handler);
 
-  const run = (config) => {
+  const run = (config = { type: "udp4" }) => {
     setDefaultErrorHandler(defaultRouter);
     initSocket(socket, resolveMessage, invokeRunCallbacks, config);
   };

@@ -1,14 +1,14 @@
 ///ENTRY POINT///
 
-//TODO: Move out
-//        [ ] and Extensions to separate projects(stateConfig.json, change file-based logic and pass iocContainer?)
-//        [ ] IocContainer(separate iocConfig),
+//TODO: Move out IocContainer,
 //TODO: Add built-in support for different IoC Containers
 
 const { resolve } = require("./libs/iocContainer");
 
 const config = resolve("config");
 const theFramework = resolve("theFramework");
+const theStateMachine = resolve("theStateMachine");
+
 const app = theFramework(config);
 
 app
@@ -16,7 +16,7 @@ app
     const { ip, port, type } = address;
     console.log(`Server running on ${ip}:${port} (${type})\n`);
   })
-  .useStateMachine(/^\/api/)
+  .useExtension(theStateMachine, /^\/api/)
   .bindEndpoint(/^\//, ({ data }, next) => {
     console.log(`Logger: ${data?.action}`);
     next();

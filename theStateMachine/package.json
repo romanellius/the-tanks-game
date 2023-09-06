@@ -1,0 +1,24 @@
+{
+  "name": "the_state_machine",
+  "version": "1.0.0",
+  "description": "State Machine extension for the 'theFramework' framework.\\nCarve your server's business logic into independent states with shareable context for additional flexibility.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "state-machine",
+    "finite-state-machine",
+    "finite-automata"
+  ],
+  "author": "RAM",
+  "license": "ISC",
+  "dependencies": {
+    "lodash.attempt": "^4.2.0",
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.compact": "^3.0.1",
+    "lodash.foreach": "^4.5.0",
+    "lodash.iserror": "^3.1.1",
+    "lodash.isplainobject": "^4.0.6"
+  }
+}

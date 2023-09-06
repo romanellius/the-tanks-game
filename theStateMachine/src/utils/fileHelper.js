@@ -1,12 +1,12 @@
 const fs = require("fs");
-const { resolve, join, parse } = require("path");
+const { join, parse } = require("path");
+
+//private functions
+const getAbsPath = (relativePath) => join(require.main.path, relativePath);
 
 //public functions
-const joinPaths = (...paths) => join(...paths);
-const resolvePath = (path) => resolve(path);
-
 const getFolders = (path) => {
-  const absPath = resolve(path);
+  const absPath = getAbsPath(path);
   const entries = fs.readdirSync(absPath, {
     withFileTypes: true,
   });
@@ -27,7 +27,7 @@ const getMatchingFileAbsPath = (absFolderPath, pattern) => {
 };
 
 function* genGetAllFiles(path) {
-  const absPath = resolve(path);
+  const absPath = getAbsPath(path);
   const entries = fs.readdirSync(absPath, {
     withFileTypes: true,
   });
@@ -42,16 +42,13 @@ function* genGetAllFiles(path) {
 }
 
 const getFile = (path) => {
-  const absPath = resolve(path);
+  const absPath = getAbsPath(path);
   return fs.readFileSync(absPath);
 };
 
 const getFileNameWithNoExtension = (fullName) => parse(fullName).name;
 
 module.exports = {
-  joinPaths,
-  resolvePath,
-
   getFolders,
   getMatchingFileAbsPath,
   getAllFiles: genGetAllFiles,

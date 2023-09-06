@@ -1,12 +1,6 @@
 ///Framework: EXTENSION Support///
 
-module.exports = (
-  server,
-  useExtensions,
-  { makeChainable, wrapWithErrorHandler },
-  doSupportExtensions,
-  config
-) => {
+module.exports = (server, { makeChainable, wrapWithErrorHandler }, config) => {
   //init
   const {
     builder: {
@@ -19,33 +13,20 @@ module.exports = (
     },
   } = server;
 
-  const props = { onRun, bindEndpoint, addErrorHandler };
+  const props = { onRun, bindEndpoint, addErrorHandler, useExtension };
   makeChainable(props);
 
-  doSupportExtensions && buildExtensions();
-
   //private functions
-  function bindRunHandlers(runHandlers, onRun) {
-    wrapWithErrorHandler(runHandlers, (error) => {
+  function useExtension(extensionHandler, ...props) {
+    wrapWithErrorHandler([extensionHandler], (error) => {
+      throw `Build: Extension can not be initialized: ${error}`;
+    });
+    const runHandler = extensionHandler(server, ...props);
+
+    wrapWithErrorHandler([runHandler], (error) => {
       throw `Run: Extension can not be started: ${error}`;
     });
-    onRun(runHandlers);
-  }
-
-  function bindConfigHandlers(target, configHandlers) {
-    wrapWithErrorHandler(configHandlers, (error) => {
-      throw `Build: Extension can not be configured: ${error}`;
-    });
-    makeChainable(configHandlers);
-
-    Object.assign(target, configHandlers);
-  }
-
-  function buildExtensions() {
-    const { runHandlers, configHandlers } = useExtensions(server);
-
-    bindRunHandlers(runHandlers, onRunExtensions);
-    bindConfigHandlers(props, configHandlers);
+    onRunExtensions([runHandler]);
   }
 
   return {

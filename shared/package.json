@@ -5,8 +5,5 @@
   "main": "src/index.js",
   "scripts": {},
   "author": "RAM",
-  "license": "ISC",
-  "dependencies": {
-    "lodash.clonedeep": "^4.5.0"
-  }
+  "license": "ISC"
 }

@@ -1,28 +1,8 @@
 module.exports = {
   "core/framework": {
-    handler: (
-      server,
-      extensions,
-      functionHelper,
-      doSupportExtensions,
-      config
-    ) =>
-      require("./core/framework")(
-        server,
-        extensions,
-        functionHelper,
-        doSupportExtensions,
-        config
-      ),
-    dependencies: [
-      "core/server/server",
-      "core/useExtensions",
-      "helpers/functionHelper",
-    ],
-  },
-  "core/useExtensions": {
-    handler: (fileHelper) => require("./core/useExtensions")(fileHelper),
-    dependencies: ["helpers/fileHelper"],
+    handler: (server, functionHelper, config) =>
+      require("./core/framework")(server, functionHelper, config),
+    dependencies: ["core/server/server", "helpers/functionHelper"],
   },
   "core/server/server": {
     handler: (protocol, clients, router, callbacks, functionHelper) =>
@@ -64,10 +44,6 @@ module.exports = {
   },
   "helpers/isRoutePatternDynamic": {
     handler: () => require("./utils/regexpHelper").isRegExp,
-    isSingleton: true,
-  },
-  "helpers/fileHelper": {
-    handler: () => require("../../shared").utils.fileHelper,
     isSingleton: true,
   },
   "helpers/flattenAddress": {

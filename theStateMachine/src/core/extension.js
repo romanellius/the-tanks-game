@@ -11,9 +11,8 @@ const {
   getAllFiles,
   getFile,
   getFileNameWithNoExtension,
-} = require("../../../../shared").utils.fileHelper;
-const iocContainer = require("../../libs/iocContainer");
-const createContext = require("./context");
+} = require("../utils/fileHelper");
+const useContext = require("./useContext");
 
 //init
 const states = {};
@@ -40,7 +39,7 @@ const registerStateContext = () => {
     throw "State Machine: Context: Already has been registered";
   }
 
-  stateContext = createContext();
+  stateContext = useContext();
 };
 
 const registerStateRouter = (addRouter, path) => {
@@ -56,9 +55,18 @@ const bindServerProps = (serverInterface) => {
 };
 
 const getStateConfig = () => {
-  const stateConfigJson = getFile("./src/stateConfig.json");
+  const stateConfigJson = getFile("stateConfig.json");
   const parsedStateConfig = attempt(JSON.parse, stateConfigJson);
   return !isError(parsedStateConfig) ? parsedStateConfig : {};
+};
+
+const getStateHandlers = (absPath, serverInterface) => {
+  const { handler, disposeHandler } = require(absPath)({
+    server: serverInterface,
+    context: stateContext,
+  });
+
+  return { handler, disposeHandler };
 };
 
 const getStateDataFromFolderStructure = (serverInterface, stateFolders) => {
@@ -67,11 +75,10 @@ const getStateDataFromFolderStructure = (serverInterface, stateFolders) => {
   return stateFolders.reduce((stateData, { name, absPath }) => {
     const fileAbsPath = getMatchingFileAbsPath(absPath, stateFilePattern);
     if (fileAbsPath) {
-      const { handler, disposeHandler } = require(fileAbsPath)({
-        server: serverInterface,
-        iocContainer,
-        context: stateContext,
-      });
+      const { handler, disposeHandler } = getStateHandlers(
+        fileAbsPath,
+        serverInterface
+      );
 
       stateData.push({
         name,
@@ -86,11 +93,10 @@ const getStateDataFromFolderStructure = (serverInterface, stateFolders) => {
 
 const getStateDataFromFileStructure = (serverInterface, path) => {
   return getAllFiles(path).map((file) => {
-    const { handler, disposeHandler } = require(file.absPath)({
-      server: serverInterface,
-      iocContainer,
-      context: stateContext,
-    });
+    const { handler, disposeHandler } = getStateHandlers(
+      file.absPath,
+      serverInterface
+    );
 
     return {
       name: getFileNameWithNoExtension(file.name),
@@ -101,7 +107,7 @@ const getStateDataFromFileStructure = (serverInterface, path) => {
 };
 
 const getStateData = (serverInterface) => {
-  const path = "./src/states";
+  const path = "states";
   const nestedFolders = getFolders(path);
 
   return nestedFolders.length === 0
@@ -238,15 +244,9 @@ const run = (state) => {
   invokeHandler(currState);
 };
 
-module.exports = (server) => {
-  return {
-    config: {
-      useStateMachine: (routerPattern) => {
-        const { builder: serverBuilder, interface: serverInterface } = server;
+module.exports = (server, routerPattern) => {
+  const { builder: serverBuilder, interface: serverInterface } = server;
+  build(serverBuilder, serverInterface, routerPattern);
 
-        return build(serverBuilder, serverInterface, routerPattern);
-      },
-    },
-    run: () => initState && run(initState),
-  };
+  return () => initState && run(initState);
 };

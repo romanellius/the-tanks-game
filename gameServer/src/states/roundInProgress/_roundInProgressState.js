@@ -1,3 +1,9 @@
+const { toString: flattenAddress } =
+  require("../../../../shared").utils.addressHelper;
+const {
+  stringifyWithMapDataType: stringifyWithMap,
+} = require("../../utils/jsonHelper");
+
 let localWorldState;
 
 const tickRate = 1;
@@ -185,15 +191,9 @@ const endpoints = {
 
 module.exports = (framework) => {
   const {
-    iocContainer: { resolve: resolveDependency },
     context: { use: useContext, update: updateContext },
     server,
   } = framework;
-
-  const flattenAddress = resolveDependency("helpers/flattenAddress");
-  const stringifyWithMapDataType = resolveDependency(
-    "helpers/stringifyWithMap"
-  );
 
   return {
     handler: (router) => {
@@ -218,7 +218,7 @@ module.exports = (framework) => {
         updateWorld();
 
         server.send(
-          stringifyWithMapDataType({
+          stringifyWithMap({
             action: "state",
             state: localWorldState,
           })

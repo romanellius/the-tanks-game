@@ -1,8 +1,9 @@
 ///ENTRY POINT///
 
 const { resolve } = require("./libs/iocContainer");
+const { toString: flattenAddress } =
+  require("../../shared").utils.addressHelper;
 
-const flattenAddress = resolve("helpers/flattenAddress");
 const config = resolve("config");
 const theFramework = resolve("theFramework");
 

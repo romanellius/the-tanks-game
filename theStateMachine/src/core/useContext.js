@@ -1,7 +1,7 @@
 /// Shareable Between States CONTEXT ///
 
 const isPlainObject = require("lodash.isplainobject");
-const { createClone } = require("../../../../shared").utils.objectHelper;
+const { createClone } = require("../utils/objectHelper");
 
 module.exports = () => {
   //init

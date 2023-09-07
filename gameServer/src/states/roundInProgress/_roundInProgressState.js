@@ -23,15 +23,15 @@ const clientsData = new Map();
 const getDistance = ({ x: x1, y: y1 }, { x: x2, y: y2 }) =>
   Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 
-const checkCapture = (address, position) => {
+const checkCapture = (address, position, stateTransitionTo) => {
   const isCaptured = getDistance(position, localWorldState.flag) <= 0.5;
   if (isCaptured) {
     localWorldState.captured = address;
-    server.stateTransitionTo("next");
+    stateTransitionTo("next");
   }
 };
 
-const checkKill = (address, position) => {
+const checkKill = (address, position, stateTransitionTo) => {
   const enemyPosition = localWorldState.players.get(
     localWorldState.players.get(address).enemy
   ).position;
@@ -39,7 +39,7 @@ const checkKill = (address, position) => {
   const isKilled = getDistance(position, enemyPosition) <= 0.5;
   if (isKilled) {
     localWorldState.killer = address;
-    server.stateTransitionTo("next");
+    stateTransitionTo("next");
   }
 };
 
@@ -160,7 +160,7 @@ const movePlayer = (address, enemyAddress, x, y, move) => {
   return newPosition;
 };
 
-const updateWorld = () => {
+const updateWorld = (stateTransitionTo) => {
   localWorldState.players.forEach((player, address) => {
     const { x, y } = player.position;
     const { move, fire } = { ...clientsData.get(address) };
@@ -169,7 +169,7 @@ const updateWorld = () => {
       player.direction = move;
 
       const newPosition = movePlayer(address, player.enemy, x, y, move);
-      checkCapture(address, newPosition);
+      checkCapture(address, newPosition, stateTransitionTo);
     }
 
     fire && createProjectile(address, player.position, player.direction);
@@ -179,7 +179,7 @@ const updateWorld = () => {
     const { x, y } = projectile.position;
 
     const newPosition = moveProjectile(id, x, y, projectile.move);
-    checkKill(projectile.address, newPosition);
+    checkKill(projectile.address, newPosition, stateTransitionTo);
   });
 
   clientsData.clear();
@@ -216,7 +216,7 @@ module.exports = (framework) => {
       });
 
       tickId = setInterval(() => {
-        updateWorld();
+        updateWorld(stateTransitionTo);
 
         server.send(
           stringifyWithMap({

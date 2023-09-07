@@ -1,7 +1,7 @@
 ///ENTRY POINT///
 
-const iocConfig = require("./iocConfig");
 const theStateMachine = require("../../theStateMachine");
+const iocConfig = require("./iocConfig");
 const { resolve } = require("../../theIocContainer")(iocConfig);
 
 const config = resolve("config");

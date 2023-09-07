@@ -2,8 +2,8 @@
 
 module.exports = (isRoutePatternDynamic, pattern) => {
   //init
-  const routes = [],
-    errorHandlers = [];
+  const routes = [];
+  const errorHandlers = [];
 
   pattern = normalizePattern(pattern);
 

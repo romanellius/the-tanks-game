@@ -198,6 +198,12 @@ module.exports = (framework) => {
 
   return {
     handler: (router) => {
+      stateTransitionTo = (input) => {
+        if (!stateTransitionTo(input)) {
+          throw "State 'round_in_progress': can not transit to the next state";
+        }
+      };
+
       const { worldState } = useContext();
       localWorldState = worldState;
 

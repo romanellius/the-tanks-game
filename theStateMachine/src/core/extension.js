@@ -26,9 +26,7 @@ let stateContext;
 //private functions
 const isRun = () => !!currState;
 
-const safeTransitionTo = (nextInput) => {
-  isRun() && transitionTo(nextInput);
-};
+const safeTransitionTo = (nextInput) => isRun() && transitionTo(nextInput);
 
 const registerStateContext = () => {
   if (stateContext) {
@@ -210,9 +208,14 @@ const build = ({ bindRouter }, serverInterface, routerPattern = /^\/api/) => {
 
 const transitionTo = (nextInput) => {
   if (!isRun() || !states[currState].conditions[nextInput]) {
+    console.error(
+      `StateMachine: Can not transit to the next state using ${"next"} symbol`
+    );
     return false;
   }
 
+  //FIXME: create new router - not reset (make old router instance throw an exception)
+  //FIXME: also reset the "stateTransitionTo: (input) => safeTransitionTo(input)" to throw an exception
   stateRouter.reset();
   invokeDisposeHandler(currState);
 

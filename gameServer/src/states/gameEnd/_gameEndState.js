@@ -3,6 +3,9 @@ module.exports = ({ stateTransitionTo, server }) => ({
     server.send(
       JSON.stringify({ action: "gameEnd", stats: "GAME STATISTICS" })
     );
-    stateTransitionTo("next");
+
+    if (!stateTransitionTo("next")) {
+      throw "State 'game_end': can not transit to the next state";
+    }
   },
 });

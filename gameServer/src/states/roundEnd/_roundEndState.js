@@ -9,6 +9,12 @@ module.exports = (framework) => {
 
   return {
     handler: () => {
+      stateTransitionTo = (input) => {
+        if (!stateTransitionTo(input)) {
+          throw "State 'round_end': can not transit to the next state";
+        }
+      };
+
       const { worldState } = useContext();
 
       server.send(

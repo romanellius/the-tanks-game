@@ -1,6 +1,6 @@
 module.exports = {
   theFramework: {
-    handler: (_, config) => require("../../theFramework")(config),
+    handler: ({ props }) => require("../../theFramework")(...props),
   },
 
   config: {

@@ -1,26 +1,12 @@
 module.exports = {
   "core/framework": {
-    handler: (server, functionHelper, _, config) =>
-      require("./core/framework")(server, functionHelper, config),
+    handler: ({ dependencies, props }) =>
+      require("./core/framework")(...dependencies, ...props),
     dependencies: ["core/server/server", "helpers/functionHelper"],
   },
   "core/server/server": {
-    handler: (
-      protocol,
-      clients,
-      router,
-      callbacks,
-      functionHelper,
-      resolveDependency
-    ) =>
-      require("./core/server/server")(
-        protocol,
-        clients,
-        router,
-        callbacks,
-        functionHelper,
-        resolveDependency
-      ),
+    handler: ({ dependencies, resolve }) =>
+      require("./core/server/server")(...dependencies, resolve),
     dependencies: [
       "core/server/protocols/udp",
       "core/server/clients",
@@ -30,16 +16,16 @@ module.exports = {
     ],
   },
   "core/server/clients": {
-    handler: (flattenAddress) =>
-      require("./core/server/clients")(flattenAddress),
+    handler: ({ dependencies }) =>
+      require("./core/server/clients")(...dependencies),
     dependencies: ["helpers/flattenAddress"],
   },
   "core/server/initCallbacks": {
     handler: () => require("./core/server/initCallbacks")(),
   },
   "core/server/router": {
-    handler: (isRoutePatternDynamic, _, rootPattern) =>
-      require("./core/server/router")(isRoutePatternDynamic, rootPattern),
+    handler: ({ dependencies, props }) =>
+      require("./core/server/router")(...dependencies, ...props),
     dependencies: ["helpers/isRoutePatternDynamic"],
   },
   "core/server/protocols/udp": {

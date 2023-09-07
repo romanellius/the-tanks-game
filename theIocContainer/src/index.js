@@ -110,7 +110,11 @@ module.exports = (configObject) => {
     const resolvedArgDependencies = argDependencies.map((argDependency) =>
       resolve(argDependency)
     );
-    const newInstance = handler(...resolvedArgDependencies, resolve, ...props);
+    const newInstance = handler({
+      dependencies: resolvedArgDependencies,
+      props,
+      resolve,
+    });
     if (isSingleton) {
       dependency.instance = newInstance;
     }

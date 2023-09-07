@@ -61,7 +61,7 @@ const generateWorld = (server) => {
 };
 
 module.exports = (framework) => {
-  const { context, server } = framework;
+  const { context, server, stateTransitionTo } = framework;
 
   return {
     handler: () => {
@@ -80,7 +80,7 @@ module.exports = (framework) => {
       );
 
       setTimeout(() => {
-        server.stateTransitionTo("next");
+        stateTransitionTo("next");
       }, roundStartDelay);
     },
   };

@@ -3,7 +3,7 @@ const endpoints = {
   leave: "/leave",
 };
 
-module.exports = ({ server }) => {
+module.exports = ({ stateTransitionTo, server }) => {
   return {
     handler: (router) => {
       server.clearClients();
@@ -21,7 +21,7 @@ module.exports = ({ server }) => {
             //TODO: should stateTransitionTo be hidden inside of the code
             // - maybe move it out to the stateConfig file
             // - or move it to the same level as handler and disposeHandler
-            server.getClientCount() === 2 && server.stateTransitionTo("next")
+            server.getClientCount() === 2 && stateTransitionTo("next")
         );
       });
 
@@ -33,5 +33,3 @@ module.exports = ({ server }) => {
     disposeHandler: () => {},
   };
 };
-
-//TODO: start here when others are fixed

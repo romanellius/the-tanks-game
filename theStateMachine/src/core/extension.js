@@ -23,16 +23,12 @@ let currState;
 let stateRouter;
 let stateContext;
 
-const runtimeServerProps = {
-  stateTransitionTo: safeTransitionTo,
-};
-
 //private functions
 const isRun = () => !!currState;
 
-function safeTransitionTo(nextInput) {
+const safeTransitionTo = (nextInput) => {
   isRun() && transitionTo(nextInput);
-}
+};
 
 const registerStateContext = () => {
   if (stateContext) {
@@ -50,10 +46,6 @@ const registerStateRouter = (addRouter, path) => {
   stateRouter = addRouter(path);
 };
 
-const bindServerProps = (serverInterface) => {
-  Object.assign(serverInterface, runtimeServerProps);
-};
-
 const getStateConfig = () => {
   const stateConfigJson = getFile("stateConfig.json");
   const parsedStateConfig = attempt(JSON.parse, stateConfigJson);
@@ -62,6 +54,7 @@ const getStateConfig = () => {
 
 const getStateHandlers = (absPath, serverInterface) => {
   const { handler, disposeHandler } = require(absPath)({
+    stateTransitionTo: (input) => safeTransitionTo(input),
     server: serverInterface,
     context: stateContext,
   });
@@ -206,8 +199,6 @@ const build = ({ bindRouter }, serverInterface, routerPattern = /^\/api/) => {
 
   registerStateRouter(bindRouter, routerPattern);
   registerStateContext();
-
-  bindServerProps(serverInterface);
 
   const stateData = getStateData(serverInterface);
   const stateConfig = getStateConfig();

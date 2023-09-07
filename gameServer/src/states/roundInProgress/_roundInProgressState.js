@@ -193,6 +193,7 @@ module.exports = (framework) => {
   const {
     context: { use: useContext, update: updateContext },
     server,
+    stateTransitionTo,
   } = framework;
 
   return {
@@ -227,7 +228,7 @@ module.exports = (framework) => {
 
       roundTimerId = setTimeout(() => {
         localWorldState.timeIsOver = true;
-        server.stateTransitionTo("next");
+        stateTransitionTo("next");
       }, roundLimitTime);
     },
 

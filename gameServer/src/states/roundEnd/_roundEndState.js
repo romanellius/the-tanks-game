@@ -4,6 +4,7 @@ module.exports = (framework) => {
   const {
     context: { use: useContext, remove: removeContext },
     server,
+    stateTransitionTo,
   } = framework;
 
   return {
@@ -22,9 +23,9 @@ module.exports = (framework) => {
       setTimeout(() => {
         if (worldState.round === 1) {
           removeContext({ worldState });
-          server.stateTransitionTo("next");
+          stateTransitionTo("next");
         } else {
-          server.stateTransitionTo("prev");
+          stateTransitionTo("prev");
         }
       }, roundEndDelay);
     },

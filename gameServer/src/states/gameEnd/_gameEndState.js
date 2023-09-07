@@ -1,8 +1,8 @@
-module.exports = ({ server }) => ({
+module.exports = ({ stateTransitionTo, server }) => ({
   handler: () => {
     server.send(
       JSON.stringify({ action: "gameEnd", stats: "GAME STATISTICS" })
     );
-    server.stateTransitionTo("next");
+    stateTransitionTo("next");
   },
 });

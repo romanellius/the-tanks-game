@@ -1,6 +1,7 @@
 {
   "@wait": {
-    "next": "roundStart"
+    "next": "roundStart",
+    "prev": "!end"
   },
   "roundStart": {
     "next": "roundInProgress"
@@ -14,5 +15,6 @@
   },
   "gameEnd": {
     "next": "@wait"
-  }
+  },
+  "!end": null
 }

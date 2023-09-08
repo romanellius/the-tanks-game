@@ -1,6 +1,9 @@
+const dns = require("dns");
+
 const endpoints = {
   join: "/join",
   leave: "/leave",
+  end: "/end",
 };
 
 module.exports = ({ stateTransitionTo, server }) => {
@@ -38,10 +41,28 @@ module.exports = ({ stateTransitionTo, server }) => {
       router.bindEndpoint(endpoints.leave, ({ remote }) => {
         server.disconnectClient(remote);
       });
+
+      router.bindEndpoint(endpoints.end, ({ remote }) => {
+        dns.lookup(remote.address, (error, resolvedAddress) => {
+          if (error) {
+            console.warn(
+              `State '@wait': can not resolve "${remote.address}" address: ${error}`
+            );
+          }
+
+          if (
+            //check for ipv6 too?
+            resolvedAddress === "127.0.0.1" ||
+            remote.address === "127.0.0.1"
+          ) {
+            if (!stateTransitionTo("prev")) {
+              throw "State '@wait': can not transit to the final state";
+            }
+          }
+        });
+      });
     },
 
     disposeHandler: () => {},
   };
 };
-
-//FIXME: add final state

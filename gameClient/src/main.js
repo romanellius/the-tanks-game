@@ -110,6 +110,9 @@ client.on("connect", () => {
       case "t":
         action = "api/test";
         break;
+      case "e":
+        action = "api/end";
+        break;
       default:
         return;
     }

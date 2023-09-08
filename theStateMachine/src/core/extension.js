@@ -50,14 +50,25 @@ const getStateConfig = () => {
   return !isError(parsedStateConfig) ? parsedStateConfig : {};
 };
 
-const getStateHandlers = (absPath, serverInterface) => {
+const getStateHandlers = (absPath, serverInterface, isFinalState) => {
   const { handler, disposeHandler } = require(absPath)({
-    stateTransitionTo: (input) => safeTransitionTo(input),
+    stateTransitionTo: !isFinalState
+      ? (input) => safeTransitionTo(input)
+      : () => {
+          throw `StateMachine: "stateTransitionTo" method is not accessible: final state`;
+        },
     server: serverInterface,
     context: stateContext,
   });
 
-  return { handler, disposeHandler };
+  return {
+    handler,
+    disposeHandler: !isFinalState
+      ? disposeHandler
+      : () => {
+          throw `StateMachine: "disposeHandler" is not allowed: final state`;
+        },
+  };
 };
 
 const getStateDataFromFolderStructure = (serverInterface, stateFolders) => {
@@ -66,15 +77,18 @@ const getStateDataFromFolderStructure = (serverInterface, stateFolders) => {
   return stateFolders.reduce((stateData, { name, absPath }) => {
     const fileAbsPath = getMatchingFileAbsPath(absPath, stateFilePattern);
     if (fileAbsPath) {
+      const isFinal = name.startsWith("!");
       const { handler, disposeHandler } = getStateHandlers(
         fileAbsPath,
-        serverInterface
+        serverInterface,
+        isFinal
       );
 
       stateData.push({
         name,
         handler,
         disposeHandler,
+        isFinal,
       });
     }
 
@@ -84,15 +98,18 @@ const getStateDataFromFolderStructure = (serverInterface, stateFolders) => {
 
 const getStateDataFromFileStructure = (serverInterface, path) => {
   return getAllFiles(path).map((file) => {
+    const isFinal = file.name.startsWith("!");
     const { handler, disposeHandler } = getStateHandlers(
       file.absPath,
-      serverInterface
+      serverInterface,
+      isFinal
     );
 
     return {
       name: getFileNameWithNoExtension(file.name),
       handler,
       disposeHandler,
+      isFinal,
     };
   });
 };
@@ -123,11 +140,13 @@ const validateConfiguration = (stateConfig, stateData) => {
   forEach(stateConfig, (state, stateName) => {
     stateName.startsWith("@") && initStatesCount++;
 
-    eachFromStateIsValid &&= isPlainObject(state);
+    eachFromStateIsValid &&= stateName.startsWith("!")
+      ? !state
+      : isPlainObject(state);
     if (!eachFromStateIsValid) return false;
 
     forEach(state, (toState) => {
-      eachToStateExists &&= !!stateConfig[toState];
+      eachToStateExists &&= toState in stateConfig;
     });
 
     eachStateHasHandler &&= !!stateHandlers[stateName]?.handler;
@@ -162,28 +181,43 @@ const bindStateConditions = (stateConfig) => {
 };
 
 const bindStateHandlers = (stateData) => {
-  stateData.forEach(({ name, handler, disposeHandler }) => {
+  stateData.forEach(({ name, handler, disposeHandler, isFinal }) => {
     states[name] = Object.assign(states[name] ?? {}, {
       handler,
       disposeHandler,
+      isFinal,
     });
   });
 };
 
-const invokeHandler = (state) => {
+const invokeHandler = (stateName) => {
+  const { handler, isFinal } = states[stateName];
   const { bindEndpoint, addErrorHandler } = stateRouter;
-  const stateRouterInterface = { bindEndpoint, addErrorHandler };
+
+  const stateRouterInterface = {
+    bindEndpoint: !isFinal
+      ? bindEndpoint
+      : () => {
+          throw `StateMachine: "bindEndpoint" method is not accessible: final state`;
+        },
+    addErrorHandler: !isFinal
+      ? addErrorHandler
+      : () => {
+          throw `StateMachine: "addErrorHandler" method is not accessible: final state`;
+        },
+  };
 
   try {
-    states[state].handler(stateRouterInterface);
+    handler(stateRouterInterface);
   } catch (error) {
-    throw `State Machine: "${state}" handler can not be proceed: ${error}`;
+    throw `State Machine: "${stateName}" handler can not be proceed: ${error}`;
   }
 };
 
 const invokeDisposeHandler = (state) => {
+  const { disposeHandler } = states[state];
   try {
-    states[state].disposeHandler && states[state].disposeHandler();
+    disposeHandler && disposeHandler();
   } catch (error) {
     throw `State Machine: "${state}" dispose handler can not be proceed: ${error}`;
   }

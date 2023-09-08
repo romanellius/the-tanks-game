@@ -23,6 +23,8 @@ module.exports = (
     clearClients: clients.clearAll,
 
     send: sendMessage,
+
+    stop,
   };
 
   //private functions
@@ -151,6 +153,10 @@ module.exports = (
   const onRun = (callback) => initCallbacks.onRun.add(callback);
   const onRunExtensions = (callbacks) =>
     initCallbacks.onRun.addExtensions(callbacks);
+
+  function stop() {
+    socket.terminate();
+  }
 
   return {
     interface: thisServerInterface,

@@ -2,8 +2,8 @@
 
 const iocConfig = require("./iocConfig");
 const { resolve } = require("../../theIocContainer")(iocConfig);
-const { toString: flattenAddress } =
-  require("../../shared").utils.addressHelper;
+
+const flattenAddress = resolve("helpers/flattenAddress");
 
 const config = resolve("config");
 const app = resolve("theFramework", config);

@@ -1,9 +1,3 @@
-const { toString: flattenAddress } =
-  require("../../../../shared").utils.addressHelper;
-const {
-  stringifyWithMapDataType: stringifyWithMap,
-} = require("../../utils/jsonHelper");
-
 let localWorldState;
 
 const tickRate = 1;
@@ -194,11 +188,15 @@ module.exports = (framework) => {
     context: { use: useContext, update: updateContext },
     server,
     stateTransitionTo,
+    refs: { resolveDependency },
   } = framework;
+
+  const stringifyWithMap = resolveDependency("helpers/stringifyWithMap");
+  const flattenAddress = resolveDependency("helpers/flattenAddress");
 
   return {
     handler: (router) => {
-      stateTransitionTo = (input) => {
+      const safeStateTransitionTo = (input) => {
         if (!stateTransitionTo(input)) {
           throw "State 'round_in_progress': can not transit to the next state";
         }
@@ -222,7 +220,7 @@ module.exports = (framework) => {
       });
 
       tickId = setInterval(() => {
-        updateWorld(stateTransitionTo);
+        updateWorld(safeStateTransitionTo);
 
         server.send(
           stringifyWithMap({
@@ -234,7 +232,7 @@ module.exports = (framework) => {
 
       roundTimerId = setTimeout(() => {
         localWorldState.timeIsOver = true;
-        stateTransitionTo("next");
+        safeStateTransitionTo("next");
       }, roundLimitTime);
     },
 

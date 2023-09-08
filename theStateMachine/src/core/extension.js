@@ -50,7 +50,7 @@ const getStateConfig = () => {
   return !isError(parsedStateConfig) ? parsedStateConfig : {};
 };
 
-const getStateHandlers = (absPath, serverInterface, isFinalState) => {
+const getStateHandlers = (absPath, serverInterface, isFinalState, refs) => {
   const { handler, disposeHandler } = require(absPath)({
     stateTransitionTo: !isFinalState
       ? (input) => safeTransitionTo(input)
@@ -59,6 +59,7 @@ const getStateHandlers = (absPath, serverInterface, isFinalState) => {
         },
     server: serverInterface,
     context: stateContext,
+    refs,
   });
 
   return {
@@ -71,7 +72,11 @@ const getStateHandlers = (absPath, serverInterface, isFinalState) => {
   };
 };
 
-const getStateDataFromFolderStructure = (serverInterface, stateFolders) => {
+const getStateDataFromFolderStructure = (
+  serverInterface,
+  stateFolders,
+  refs
+) => {
   const stateFilePattern = /^_[^_\.]*\.js$/;
 
   return stateFolders.reduce((stateData, { name, absPath }) => {
@@ -81,7 +86,8 @@ const getStateDataFromFolderStructure = (serverInterface, stateFolders) => {
       const { handler, disposeHandler } = getStateHandlers(
         fileAbsPath,
         serverInterface,
-        isFinal
+        isFinal,
+        refs
       );
 
       stateData.push({
@@ -96,13 +102,14 @@ const getStateDataFromFolderStructure = (serverInterface, stateFolders) => {
   }, []);
 };
 
-const getStateDataFromFileStructure = (serverInterface, path) => {
+const getStateDataFromFileStructure = (serverInterface, path, refs) => {
   return getAllFiles(path).map((file) => {
     const isFinal = file.name.startsWith("!");
     const { handler, disposeHandler } = getStateHandlers(
       file.absPath,
       serverInterface,
-      isFinal
+      isFinal,
+      refs
     );
 
     return {
@@ -114,13 +121,13 @@ const getStateDataFromFileStructure = (serverInterface, path) => {
   });
 };
 
-const getStateData = (serverInterface) => {
+const getStateData = (serverInterface, refs) => {
   const path = "states";
   const nestedFolders = getFolders(path);
 
   return nestedFolders.length === 0
-    ? getStateDataFromFileStructure(serverInterface, path)
-    : getStateDataFromFolderStructure(serverInterface, nestedFolders);
+    ? getStateDataFromFileStructure(serverInterface, path, refs)
+    : getStateDataFromFolderStructure(serverInterface, nestedFolders, refs);
 };
 
 const validateConfiguration = (stateConfig, stateData) => {
@@ -224,7 +231,12 @@ const invokeDisposeHandler = (state) => {
 };
 
 //main functions
-const build = ({ bindRouter }, serverInterface, routerPattern = /^\/api/) => {
+const build = (
+  { bindRouter },
+  serverInterface,
+  refs,
+  routerPattern = /^\/api/
+) => {
   if (Object.keys(states).length) {
     throw "State Machine: Already has been built";
   }
@@ -232,7 +244,7 @@ const build = ({ bindRouter }, serverInterface, routerPattern = /^\/api/) => {
   registerStateRouter(bindRouter, routerPattern);
   registerStateContext();
 
-  const stateData = getStateData(serverInterface);
+  const stateData = getStateData(serverInterface, refs);
   const stateConfig = getStateConfig();
   validateConfiguration(stateConfig, stateData);
 
@@ -272,9 +284,9 @@ const run = (state) => {
   invokeHandler(currState);
 };
 
-module.exports = (server, routerPattern) => {
+module.exports = (server, refs, routerPattern) => {
   const { builder: serverBuilder, interface: serverInterface } = server;
-  build(serverBuilder, serverInterface, routerPattern);
+  build(serverBuilder, serverInterface, refs, routerPattern);
 
   return () => initState && run(initState);
 };

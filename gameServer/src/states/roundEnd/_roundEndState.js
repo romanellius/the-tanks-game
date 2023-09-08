@@ -9,7 +9,7 @@ module.exports = (framework) => {
 
   return {
     handler: () => {
-      stateTransitionTo = (input) => {
+      const safeStateTransitionTo = (input) => {
         if (!stateTransitionTo(input)) {
           throw "State 'round_end': can not transit to the next state";
         }
@@ -29,9 +29,9 @@ module.exports = (framework) => {
       setTimeout(() => {
         if (worldState.round === 1) {
           removeContext({ worldState });
-          stateTransitionTo("next");
+          safeStateTransitionTo("next");
         } else {
-          stateTransitionTo("prev");
+          safeStateTransitionTo("prev");
         }
       }, roundEndDelay);
     },

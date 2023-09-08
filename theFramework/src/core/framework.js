@@ -17,11 +17,11 @@ module.exports = (server, { makeChainable, wrapWithErrorHandler }, config) => {
   makeChainable(props);
 
   //private functions
-  function useExtension(extensionHandler, ...props) {
+  function useExtension(extensionHandler, refs, ...props) {
     wrapWithErrorHandler([extensionHandler], (error) => {
       throw `Build: Extension can not be initialized: ${error}`;
     });
-    const runHandler = extensionHandler(server, ...props);
+    const runHandler = extensionHandler(server, refs, ...props);
 
     wrapWithErrorHandler([runHandler], (error) => {
       throw `Run: Extension can not be started: ${error}`;

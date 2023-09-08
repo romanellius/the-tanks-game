@@ -1,8 +1,5 @@
 const times = require("lodash.times");
 const forEach = require("lodash.foreach");
-const {
-  stringifyWithMapDataType: stringifyWithMap,
-} = require("../../utils/jsonHelper");
 
 let roundNumber = 0;
 const roundStartDelay = 1_000; //3_000;
@@ -61,7 +58,14 @@ const generateWorld = (server) => {
 };
 
 module.exports = (framework) => {
-  const { context, server, stateTransitionTo } = framework;
+  const {
+    context,
+    server,
+    stateTransitionTo,
+    refs: { resolveDependency },
+  } = framework;
+
+  const stringifyWithMap = resolveDependency("helpers/stringifyWithMap");
 
   return {
     handler: () => {

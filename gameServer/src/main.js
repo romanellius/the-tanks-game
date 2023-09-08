@@ -12,7 +12,7 @@ app
     const { ip, port, type } = address;
     console.log(`Server running on ${ip}:${port} (${type})\n`);
   })
-  .useExtension(theStateMachine, /^\/api/)
+  .useExtension(theStateMachine, { resolveDependency: resolve }, /^\/api/)
   .bindEndpoint(/^\//, ({ data }, next) => {
     console.log(`Logger: ${data?.action}`);
     next();

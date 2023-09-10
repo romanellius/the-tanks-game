@@ -33,7 +33,7 @@ module.exports = {
   },
 
   "helpers/functionHelper": {
-    handler: () => require("./utils/functionHelper"),
+    handler: () => require("../../shared").utils.functionHelper,
     isSingleton: true,
   },
   "helpers/isRoutePatternDynamic": {

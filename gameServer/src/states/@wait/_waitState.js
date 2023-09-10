@@ -27,10 +27,6 @@ module.exports = ({ server }) => {
             if (!stateTransitionTo("next")) {
               throw "State '@wait': can not transit to the next state";
             }
-
-            //these should throw an exception
-            // router.bindEndpoint();
-            // stateTransitionTo();
           }
         });
       });

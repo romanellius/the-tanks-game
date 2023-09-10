@@ -12,6 +12,7 @@ const {
   getFile,
   getFileNameWithNoExtension,
 } = require("../utils/fileHelper");
+const { makeChainable } = require("../../../shared").utils.functionHelper;
 const useContext = require("./useContext");
 
 //init
@@ -19,6 +20,7 @@ const states = {};
 
 let initState;
 let currState;
+let currentStateId = 0;
 
 let stateRouter;
 let stateContext;
@@ -196,27 +198,47 @@ const invokeHandler = (stateName) => {
   const { handler, isFinal } = states[stateName];
   const { bindEndpoint, addErrorHandler } = stateRouter;
 
+  const stateId = ++currentStateId;
+  const protectFromInactiveState = (handler, errorMessage) => {
+    if (stateId < currentStateId) {
+      throw errorMessage;
+    }
+    return handler;
+  };
+
   const stateRouterInterface = {
     bindEndpoint: !isFinal
-      ? bindEndpoint
+      ? protectFromInactiveState(
+          bindEndpoint,
+          `StateMachine: "router" is not accessible: state is not active anymore`
+        )
       : () => {
           throw `StateMachine: "bindEndpoint" method is not accessible: final state`;
         },
     addErrorHandler: !isFinal
-      ? addErrorHandler
+      ? protectFromInactiveState(
+          addErrorHandler,
+          `StateMachine: "router" is not accessible: state is not active anymore`
+        )
       : () => {
           throw `StateMachine: "addErrorHandler" method is not accessible: final state`;
         },
   };
 
   const transitionTo = !isFinal
-    ? (input) => safeTransitionTo(input)
+    ? protectFromInactiveState(
+        safeTransitionTo,
+        `StateMachine: method "stateTransitionTo" is not accessible: state is not active anymore`
+      )
     : () => {
         throw `StateMachine: "stateTransitionTo" method is not accessible: final state`;
       };
 
   try {
-    handler({ router: stateRouterInterface, stateTransitionTo: transitionTo });
+    handler({
+      router: makeChainable(stateRouterInterface),
+      stateTransitionTo: transitionTo,
+    });
   } catch (error) {
     throw `State Machine: "${stateName}" handler can not be proceed: ${error}`;
   }
@@ -261,9 +283,8 @@ const transitionTo = (nextInput) => {
     return false;
   }
 
-  //FIXME: create new router - not reset (make old router instance throw an exception)
-  //FIXME: also reset the "stateTransitionTo: (input) => safeTransitionTo(input)" to throw an exception
   stateRouter.reset();
+
   invokeDisposeHandler(currState);
 
   currState = states[currState].conditions[nextInput];

@@ -42,7 +42,7 @@ module.exports = () => {
   };
   const onTerminate = function (callback) {
     udpSocket.on("close", () =>
-      callback ? callback() : console.warn("Server stopped")
+      callback ? callback() : console.warn("\nServer stopped")
     );
     return this;
   };

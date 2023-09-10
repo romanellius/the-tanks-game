@@ -187,7 +187,6 @@ module.exports = (framework) => {
   const {
     context: { use: useContext, update: updateContext },
     server,
-    stateTransitionTo,
     refs: { resolveDependency },
   } = framework;
 
@@ -195,7 +194,7 @@ module.exports = (framework) => {
   const flattenAddress = resolveDependency("helpers/flattenAddress");
 
   return {
-    handler: (router) => {
+    handler: ({ router, stateTransitionTo }) => {
       const safeStateTransitionTo = (input) => {
         if (!stateTransitionTo(input)) {
           throw "State 'round_in_progress': can not transit to the next state";

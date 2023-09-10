@@ -4,11 +4,10 @@ module.exports = (framework) => {
   const {
     context: { use: useContext, remove: removeContext },
     server,
-    stateTransitionTo,
   } = framework;
 
   return {
-    handler: () => {
+    handler: ({ stateTransitionTo }) => {
       const safeStateTransitionTo = (input) => {
         if (!stateTransitionTo(input)) {
           throw "State 'round_end': can not transit to the next state";

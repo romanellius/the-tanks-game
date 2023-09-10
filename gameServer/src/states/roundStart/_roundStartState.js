@@ -61,14 +61,13 @@ module.exports = (framework) => {
   const {
     context,
     server,
-    stateTransitionTo,
     refs: { resolveDependency },
   } = framework;
 
   const stringifyWithMap = resolveDependency("helpers/stringifyWithMap");
 
   return {
-    handler: () => {
+    handler: ({ stateTransitionTo }) => {
       const worldState = generateWorld(server);
       if (context.has({ worldState }) === true) {
         context.update({ worldState });

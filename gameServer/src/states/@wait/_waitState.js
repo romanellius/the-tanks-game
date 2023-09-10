@@ -6,9 +6,9 @@ const endpoints = {
   end: "/end",
 };
 
-module.exports = ({ stateTransitionTo, server }) => {
+module.exports = ({ server }) => {
   return {
-    handler: (router) => {
+    handler: ({ router, stateTransitionTo }) => {
       server.clearClients();
 
       router.addErrorHandler((error, { data }) => {
@@ -19,9 +19,6 @@ module.exports = ({ stateTransitionTo, server }) => {
 
       router.bindEndpoint(endpoints.join, ({ remote }) => {
         server.connectClient(remote, () => {
-          //FIXME: move stateTransitionTo from module's parameters to handler's parameters
-          // (disposeHandler do not need to make state transitions)
-
           //TODO: should stateTransitionTo be hidden inside of the code
           // - maybe move it out to the stateConfig file
           // - or move it to the same level as handler and disposeHandler

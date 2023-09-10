@@ -52,11 +52,6 @@ const getStateConfig = () => {
 
 const getStateHandlers = (absPath, serverInterface, isFinalState, refs) => {
   const { handler, disposeHandler } = require(absPath)({
-    stateTransitionTo: !isFinalState
-      ? (input) => safeTransitionTo(input)
-      : () => {
-          throw `StateMachine: "stateTransitionTo" method is not accessible: final state`;
-        },
     server: serverInterface,
     context: stateContext,
     refs,
@@ -214,8 +209,14 @@ const invokeHandler = (stateName) => {
         },
   };
 
+  const transitionTo = !isFinal
+    ? (input) => safeTransitionTo(input)
+    : () => {
+        throw `StateMachine: "stateTransitionTo" method is not accessible: final state`;
+      };
+
   try {
-    handler(stateRouterInterface);
+    handler({ router: stateRouterInterface, stateTransitionTo: transitionTo });
   } catch (error) {
     throw `State Machine: "${stateName}" handler can not be proceed: ${error}`;
   }

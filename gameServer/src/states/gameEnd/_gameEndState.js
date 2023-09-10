@@ -1,5 +1,5 @@
-module.exports = ({ stateTransitionTo, server }) => ({
-  handler: () => {
+module.exports = ({ server }) => ({
+  handler: ({ stateTransitionTo }) => {
     server.send(
       JSON.stringify({ action: "gameEnd", stats: "GAME STATISTICS" })
     );

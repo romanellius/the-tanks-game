@@ -1,9 +1,13 @@
+const endpoints = {
+  update: "/update",
+};
+
 let localWorldState;
 
 const tickRate = 1;
 const tickInterval = 1_000 / tickRate;
 const roundLimitTime = 3_000; //30_000;
-let tickId, roundTimerId;
+let serverTickId, roundTimerId;
 let projectileId = 0;
 const damage = 50;
 
@@ -17,15 +21,16 @@ const clientsData = new Map();
 const getDistance = ({ x: x1, y: y1 }, { x: x2, y: y2 }) =>
   Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 
-const checkCapture = (address, position, stateTransitionTo) => {
+const checkCapture = (address, position) => {
   const isCaptured = getDistance(position, localWorldState.flag) <= 0.5;
   if (isCaptured) {
     localWorldState.captured = address;
-    stateTransitionTo("next");
   }
+
+  return isCaptured;
 };
 
-const checkKill = (address, position, stateTransitionTo) => {
+const checkKill = (address, position) => {
   const enemyPosition = localWorldState.players.get(
     localWorldState.players.get(address).enemy
   ).position;
@@ -33,8 +38,9 @@ const checkKill = (address, position, stateTransitionTo) => {
   const isKilled = getDistance(position, enemyPosition) <= 0.5;
   if (isKilled) {
     localWorldState.killer = address;
-    stateTransitionTo("next");
   }
+
+  return isKilled;
 };
 
 const createProjectile = (address, position, move) => {
@@ -154,7 +160,7 @@ const movePlayer = (address, enemyAddress, x, y, move) => {
   return newPosition;
 };
 
-const updateWorld = (stateTransitionTo) => {
+const updateWorld = () => {
   localWorldState.players.forEach((player, address) => {
     const { x, y } = player.position;
     const { move, fire } = { ...clientsData.get(address) };
@@ -163,7 +169,8 @@ const updateWorld = (stateTransitionTo) => {
       player.direction = move;
 
       const newPosition = movePlayer(address, player.enemy, x, y, move);
-      checkCapture(address, newPosition, stateTransitionTo);
+      const isCaptured = checkCapture(address, newPosition);
+      if (isCaptured) return true;
     }
 
     fire && createProjectile(address, player.position, player.direction);
@@ -173,14 +180,12 @@ const updateWorld = (stateTransitionTo) => {
     const { x, y } = projectile.position;
 
     const newPosition = moveProjectile(id, x, y, projectile.move);
-    checkKill(projectile.address, newPosition, stateTransitionTo);
+    const isKilled = checkKill(projectile.address, newPosition);
+    if (isKilled) return true;
   });
 
   clientsData.clear();
-};
-
-const endpoints = {
-  update: "/update",
+  return false;
 };
 
 module.exports = (framework) => {
@@ -195,12 +200,6 @@ module.exports = (framework) => {
 
   return {
     handler: ({ router, stateTransitionTo }) => {
-      const safeStateTransitionTo = (input) => {
-        if (!stateTransitionTo(input)) {
-          throw "State 'round_in_progress': can not transit to the next state";
-        }
-      };
-
       const { worldState } = useContext();
       localWorldState = worldState;
 
@@ -218,8 +217,11 @@ module.exports = (framework) => {
         }
       });
 
-      tickId = setInterval(() => {
-        updateWorld(safeStateTransitionTo);
+      serverTickId = setInterval(() => {
+        const isGameOver = updateWorld();
+        if (isGameOver) {
+          stateTransitionTo("next");
+        }
 
         server.send(
           stringifyWithMap({
@@ -231,12 +233,12 @@ module.exports = (framework) => {
 
       roundTimerId = setTimeout(() => {
         localWorldState.timeIsOver = true;
-        safeStateTransitionTo("next");
+        stateTransitionTo("next");
       }, roundLimitTime);
     },
 
     disposeHandler: () => {
-      clearInterval(tickId);
+      clearInterval(serverTickId);
       clearTimeout(roundTimerId);
 
       updateContext({ worldState: localWorldState });

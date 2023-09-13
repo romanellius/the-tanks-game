@@ -210,7 +210,7 @@ const invokeHandler = (stateName) => {
     bindEndpoint: !isFinal
       ? protectFromInactiveState(
           bindEndpoint,
-          `StateMachine: "router" is not accessible: state is not active anymore`
+          `StateMachine: "router" is not accessible: state "${stateName}" is not active`
         )
       : () => {
           throw `StateMachine: "bindEndpoint" method is not accessible: final state`;
@@ -218,7 +218,7 @@ const invokeHandler = (stateName) => {
     addErrorHandler: !isFinal
       ? protectFromInactiveState(
           addErrorHandler,
-          `StateMachine: "router" is not accessible: state is not active anymore`
+          `StateMachine: "router" is not accessible: state "${stateName}" is not active`
         )
       : () => {
           throw `StateMachine: "addErrorHandler" method is not accessible: final state`;

@@ -19,15 +19,7 @@ module.exports = ({ server }) => {
 
       router.bindEndpoint(endpoints.join, ({ remote }) => {
         server.connectClient(remote, () => {
-          //TODO: should stateTransitionTo be hidden inside of the code
-          // - maybe move it out to the stateConfig file
-          // - or move it to the same level as handler and disposeHandler
-          // { on 'condition' -> 'state transition' using 'input' symbol }
-          if (server.getClientCount() === 2) {
-            if (!stateTransitionTo("next")) {
-              throw "State '@wait': can not transit to the next state";
-            }
-          }
+          server.getClientCount() === 2 && stateTransitionTo("next");
         });
       });
 
@@ -36,22 +28,19 @@ module.exports = ({ server }) => {
       });
 
       router.bindEndpoint(endpoints.end, ({ remote }) => {
-        dns.lookup(remote.address, (error, resolvedAddress) => {
+        const lookupOptions = {
+          family: 4,
+        };
+
+        dns.lookup(remote.address, lookupOptions, (error, resolvedAddress) => {
           if (error) {
             console.warn(
               `State '@wait': can not resolve "${remote.address}" address: ${error}`
             );
           }
 
-          if (
-            //check for ipv6 too?
-            resolvedAddress === "127.0.0.1" ||
-            remote.address === "127.0.0.1"
-          ) {
-            if (!stateTransitionTo("prev")) {
-              throw "State '@wait': can not transit to the final state";
-            }
-          }
+          resolvedAddress ??= remote.address;
+          resolvedAddress === "127.0.0.1" && stateTransitionTo("final");
         });
       });
     },

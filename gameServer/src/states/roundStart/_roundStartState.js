@@ -83,9 +83,7 @@ module.exports = (framework) => {
       );
 
       setTimeout(() => {
-        if (!stateTransitionTo("next")) {
-          throw "State 'round_start': can not transit to the next state";
-        }
+        stateTransitionTo("next");
       }, roundStartDelay);
     },
   };

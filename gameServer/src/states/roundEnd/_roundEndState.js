@@ -8,12 +8,6 @@ module.exports = (framework) => {
 
   return {
     handler: ({ stateTransitionTo }) => {
-      const safeStateTransitionTo = (input) => {
-        if (!stateTransitionTo(input)) {
-          throw "State 'round_end': can not transit to the next state";
-        }
-      };
-
       const { worldState } = useContext();
 
       server.send(
@@ -28,9 +22,9 @@ module.exports = (framework) => {
       setTimeout(() => {
         if (worldState.round === 1) {
           removeContext({ worldState });
-          safeStateTransitionTo("next");
+          stateTransitionTo("next");
         } else {
-          safeStateTransitionTo("prev");
+          stateTransitionTo("prev");
         }
       }, roundEndDelay);
     },

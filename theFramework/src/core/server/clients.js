@@ -7,17 +7,26 @@ module.exports = (flattenAddress) => {
   const getKeys = () => [...connectedClients.keys()];
   const getValues = () => connectedClients.values();
   const addClient = (remote, callback) => {
-    connectedClients.size < 2 &&
-      connectedClients.set(flattenAddress(remote), {
+    const address = flattenAddress(remote);
+    const doAddressExist = connectedClients.has(address);
+
+    if (!doAddressExist) {
+      connectedClients.set(address, {
         address: { ip: remote.address.toString(), port: remote.port },
       });
+    }
 
-    callback && callback();
+    callback && callback(doAddressExist);
   };
   const removeClient = (remote, callback) => {
-    connectedClients.delete(flattenAddress(remote));
+    const address = flattenAddress(remote);
+    const doAddressExist = connectedClients.has(address);
 
-    callback && callback();
+    if (doAddressExist) {
+      connectedClients.delete(address);
+    }
+
+    callback && callback(!doAddressExist);
   };
   /*const updateClient = (remote) => {
         connectedClients.has(

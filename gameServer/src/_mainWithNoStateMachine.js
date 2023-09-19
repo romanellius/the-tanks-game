@@ -50,10 +50,16 @@ app
 app
   .bindRouter(/^\/.*/)
   .bindEndpoint(/\/.*/, ({ remote }, _, server) => {
-    server.send(`Hello, ${flattenAddress(remote)}!`, (error) =>
-      error
-        ? console.error(`Error: Message not sent to ${flattenAddress(remote)}`)
-        : console.log(`Message sent to ${flattenAddress(remote)}`)
+    server.send(
+      `Hello, ${flattenAddress(remote)}!`,
+      remote.address,
+      remote.port,
+      (error) =>
+        error
+          ? console.error(
+              `Error: Message not sent to ${flattenAddress(remote)}`
+            )
+          : console.log(`Message sent to ${flattenAddress(remote)}`)
     );
     server.disconnectClient(remote);
   })

@@ -75,7 +75,7 @@ module.exports = (framework) => {
         context.add({ worldState });
       }
 
-      server.send(
+      server.broadcast(
         stringifyWithMap({
           action: "roundOnRun",
           state: worldState,

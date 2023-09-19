@@ -23,6 +23,7 @@ module.exports = (
     clearClients: clients.clearAll,
 
     send: sendMessage,
+    broadcast: sendMessageToAll,
 
     stop,
   };
@@ -118,8 +119,7 @@ module.exports = (
   };
 
   //public functions
-  //"socket.send" OVERRIDDEN
-  function sendMessage(message, callback) {
+  function sendMessageToAll(message, callback) {
     for (const { address } of clients.getAll()) {
       socket.send(message, address.port, address.ip, (error) => {
         callback && callback(error);
@@ -127,6 +127,14 @@ module.exports = (
         error && socket.terminate();
       });
     }
+  }
+
+  function sendMessage(message, ip, port, callback) {
+    socket.send(message, port, ip, (error) => {
+      callback && callback(error);
+
+      error && socket.terminate();
+    });
   }
 
   //"rootPattern" must start with ["/](static pattern) or [/^\/](RegExp pattern)

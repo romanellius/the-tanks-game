@@ -10,7 +10,7 @@ module.exports = (framework) => {
     handler: ({ stateTransitionTo }) => {
       const { worldState } = useContext();
 
-      server.send(
+      server.broadcast(
         JSON.stringify({
           action: "roundOnEnd",
           stats: `ROUND STATISTICS: ${

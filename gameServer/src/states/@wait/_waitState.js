@@ -18,13 +18,22 @@ module.exports = ({ server }) => {
       });
 
       router.bindEndpoint(endpoints.join, ({ remote }) => {
-        server.connectClient(remote, () => {
-          server.getClientCount() === 2 && stateTransitionTo("next");
-        });
+        if (server.getClientCount() < 2) {
+          server.connectClient(remote, (isError) => {
+            if (!isError) {
+              server.send("You are connected!", remote.address, remote.port);
+              server.getClientCount() === 2 && stateTransitionTo("next");
+            }
+          });
+        }
       });
 
       router.bindEndpoint(endpoints.leave, ({ remote }) => {
-        server.disconnectClient(remote);
+        server.disconnectClient(remote, (isError) => {
+          if (!isError) {
+            server.send("You are disconnected!", remote.address, remote.port);
+          }
+        });
       });
 
       router.bindEndpoint(endpoints.end, ({ remote }) => {
@@ -39,8 +48,13 @@ module.exports = ({ server }) => {
             );
           }
 
-          resolvedAddress ??= remote.address;
-          resolvedAddress === "127.0.0.1" && stateTransitionTo("final");
+          if ((resolvedAddress ?? remote.address) === "127.0.0.1") {
+            server.broadcast("You are disconnected!");
+
+            setTimeout(() => {
+              stateTransitionTo("final");
+            }, 1_000);
+          }
         });
       });
     },

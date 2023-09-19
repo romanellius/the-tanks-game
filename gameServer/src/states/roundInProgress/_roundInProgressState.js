@@ -4,7 +4,7 @@ const endpoints = {
 
 let localWorldState;
 
-const tickRate = 1;
+const tickRate = 0.2; //10
 const tickInterval = 1_000 / tickRate;
 const roundLimitTime = 3_000; //30_000;
 let serverTickId, roundTimerId;
@@ -219,22 +219,24 @@ module.exports = (framework) => {
 
       serverTickId = setInterval(() => {
         const isGameOver = updateWorld();
-        if (isGameOver) {
-          stateTransitionTo("next");
-        }
 
-        server.send(
+        server.broadcast(
           stringifyWithMap({
             action: "state",
             state: localWorldState,
           })
         );
+
+        if (isGameOver) {
+          stateTransitionTo("next");
+        }
       }, tickInterval);
 
-      roundTimerId = setTimeout(() => {
-        localWorldState.timeIsOver = true;
-        stateTransitionTo("next");
-      }, roundLimitTime);
+      //FIXME: uncomment after tests
+      // roundTimerId = setTimeout(() => {
+      //   localWorldState.timeIsOver = true;
+      //   stateTransitionTo("next");
+      // }, roundLimitTime);
     },
 
     disposeHandler: () => {

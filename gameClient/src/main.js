@@ -80,13 +80,17 @@ client.on("connect", () => {
   */
 
   ///
+  console.log(
+    "Available Commands:\nLobby: join, leave, test, !stop\nGame: u, d, l, r, f\n"
+  );
+
   const stdin = process.openStdin();
   stdin.addListener("data", (data) => {
     const input = data.toString().trim();
 
     let move = "";
     let isFire = false;
-    let action = "update";
+    let action = "api/update";
 
     switch (input) {
       case "u":
@@ -104,20 +108,29 @@ client.on("connect", () => {
       case "f":
         isFire = true;
         break;
-      case "j":
-        action = "api/join";
-        break;
-      case "t":
+
+      case "test":
         action = "api/test";
         break;
-      case "e":
+      case "join":
+        action = "api/join";
+        break;
+      case "leave":
+        action = "api/leave";
+        break;
+      case "!stop":
         action = "api/end";
         break;
+
       default:
         return;
     }
 
-    const buffer = Buffer.from(JSON.stringify({ action, move, isFire }));
+    const requestBody = { action };
+    move && (requestBody.move = move);
+    isFire && (requestBody.isFire = isFire);
+
+    const buffer = Buffer.from(JSON.stringify(requestBody));
     client.send(buffer, (error) => {
       if (error) {
         return client.close();

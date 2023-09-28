@@ -69,7 +69,7 @@ module.exports = (framework) => {
   return {
     handler: ({ stateTransitionTo }) => {
       const worldState = generateWorld(server);
-      if (context.has({ worldState }) === true) {
+      if (context.has({ worldState })) {
         context.update({ worldState });
       } else {
         context.add({ worldState });

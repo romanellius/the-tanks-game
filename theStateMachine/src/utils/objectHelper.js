@@ -1,4 +1,5 @@
 const cloneDeep = require("lodash.clonedeep");
+const isPlainObject = require("lodash.isplainobject");
 
 //private functions
 const isObjectValidForCloning = (value) =>
@@ -46,6 +47,24 @@ const cloningReadOnlyProxyHandler = {
 const createSafeClone = (object) =>
   new Proxy(object, cloningReadOnlyProxyHandler);
 
+const processSpreadValues = (spreadValues) => {
+  //[ ["var1", "var2"] ]
+  if (Array.isArray(spreadValues[0])) {
+    return spreadValues[0];
+  }
+  //[ { var1, var2 } ]
+  if (isPlainObject(spreadValues[0])) {
+    return Object.keys(spreadValues[0]);
+  }
+  //[ "var1", "var2" ]
+  return spreadValues;
+};
+
+const getPropertyNames = (object) =>
+  isPlainObject(object) && Object.keys(object);
+
 module.exports = {
   createClone: createSafeClone,
+  processSpreadValues,
+  getPropertyNames,
 };

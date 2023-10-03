@@ -19,6 +19,7 @@ const getFolders = (path) => {
     }));
 };
 
+//returns First matching file
 const getMatchingFileAbsPath = (absFolderPath, pattern) => {
   const entries = fs.readdirSync(absFolderPath);
 

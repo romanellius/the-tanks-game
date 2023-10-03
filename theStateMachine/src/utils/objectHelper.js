@@ -48,13 +48,14 @@ const createSafeClone = (object) =>
   new Proxy(object, cloningReadOnlyProxyHandler);
 
 const processSpreadValues = (spreadValues) => {
+  const [firstSpreadValue] = spreadValues;
   //[ ["var1", "var2"] ]
-  if (Array.isArray(spreadValues[0])) {
-    return spreadValues[0];
+  if (Array.isArray(firstSpreadValue)) {
+    return firstSpreadValue;
   }
   //[ { var1, var2 } ]
-  if (isPlainObject(spreadValues[0])) {
-    return Object.keys(spreadValues[0]);
+  if (isPlainObject(firstSpreadValue)) {
+    return Object.keys(firstSpreadValue);
   }
   //[ "var1", "var2" ]
   return spreadValues;

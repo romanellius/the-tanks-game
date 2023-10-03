@@ -5,7 +5,7 @@ let roundNumber = 0;
 const roundStartDelay = 1_000; //3_000;
 
 const generateWorld = (server) => {
-  const playerAddresses = server.getClientIds();
+  const [firstPlayerAddress, secondPlayerAddress] = server.getClientIds();
   const size = 5;
   const maxBrickHealth = 100;
   const mapConfig = {
@@ -31,17 +31,17 @@ const generateWorld = (server) => {
 
   const players = new Map([
     [
-      playerAddresses[0],
+      firstPlayerAddress,
       {
-        enemy: playerAddresses[1],
+        enemy: secondPlayerAddress,
         position: { x: 0, y: 2 },
         direction: "down",
       },
     ],
     [
-      playerAddresses[1],
+      secondPlayerAddress,
       {
-        enemy: playerAddresses[0],
+        enemy: firstPlayerAddress,
         position: { x: 4, y: 2 },
         direction: "up",
       },

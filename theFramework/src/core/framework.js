@@ -1,6 +1,11 @@
-///Framework: EXTENSION Support///
+///Framework: EXTENSIONS Support and MODULES (Timers)///
 
-module.exports = (server, { makeChainable, wrapWithErrorHandler }, config) => {
+module.exports = (
+  server,
+  timers,
+  { makeChainable, wrapWithErrorHandler },
+  config
+) => {
   //init
   const {
     builder: {
@@ -16,12 +21,20 @@ module.exports = (server, { makeChainable, wrapWithErrorHandler }, config) => {
   const props = { onRun, bindEndpoint, addErrorHandler, useExtension };
   makeChainable(props);
 
+  const { setTimeout, setInterval, clearTimeout, clearInterval } = timers;
+  props.timers = {
+    setTimeout,
+    setInterval,
+    clearTimeout,
+    clearInterval,
+  };
+
   //private functions
   function useExtension(extensionHandler, refs, ...props) {
     wrapWithErrorHandler([extensionHandler], (error) => {
       throw `Build: Extension can not be initialized: ${error}`;
     });
-    const runHandler = extensionHandler(server, refs, ...props);
+    const runHandler = extensionHandler(server, timers, refs, ...props);
 
     wrapWithErrorHandler([runHandler], (error) => {
       throw `Run: Extension can not be started: ${error}`;

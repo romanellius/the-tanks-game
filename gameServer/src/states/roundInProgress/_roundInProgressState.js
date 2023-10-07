@@ -4,10 +4,9 @@ const endpoints = {
 
 let localWorldState;
 
-const tickRate = 0.2; //10
+const tickRate = 1;
 const tickInterval = 1_000 / tickRate;
-const roundLimitTime = 3_000; //30_000;
-let serverTickId, roundTimerId;
+const roundLimitTime = 3_500; //30_000;
 let projectileId = 0;
 const damage = 50;
 
@@ -192,6 +191,7 @@ module.exports = (framework) => {
   const {
     context: { use: useContext, update: updateContext },
     server,
+    timers: { setInterval, setTimeout },
     refs: { resolveDependency },
   } = framework;
 
@@ -217,7 +217,7 @@ module.exports = (framework) => {
         }
       });
 
-      serverTickId = setInterval(() => {
+      setInterval(() => {
         const isGameOver = updateWorld();
 
         server.broadcast(
@@ -233,16 +233,13 @@ module.exports = (framework) => {
       }, tickInterval);
 
       //FIXME: uncomment after tests
-      // roundTimerId = setTimeout(() => {
+      // setTimeout(() => {
       //   localWorldState.timeIsOver = true;
       //   stateTransitionTo("next");
       // }, roundLimitTime);
     },
 
     disposeHandler: () => {
-      clearInterval(serverTickId);
-      clearTimeout(roundTimerId);
-
       updateContext({ worldState: localWorldState });
     },
   };

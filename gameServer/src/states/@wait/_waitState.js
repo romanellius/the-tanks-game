@@ -7,6 +7,8 @@ const endpoints = {
 };
 
 module.exports = ({ server }) => {
+  let serverStopTimerId;
+
   return {
     handler: ({ router, stateTransitionTo }) => {
       server.clearClients();
@@ -51,7 +53,7 @@ module.exports = ({ server }) => {
           if ((resolvedAddress ?? remote.address) === "127.0.0.1") {
             server.broadcast("You are disconnected!");
 
-            setTimeout(() => {
+            serverStopTimerId = setTimeout(() => {
               stateTransitionTo("final");
             }, 1_000);
           }
@@ -59,6 +61,8 @@ module.exports = ({ server }) => {
       });
     },
 
-    disposeHandler: () => {},
+    disposeHandler: () => {
+      clearTimeout(serverStopTimerId);
+    },
   };
 };

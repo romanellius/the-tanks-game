@@ -24,26 +24,17 @@ let currentStateId = 0;
 
 let stateRouter;
 let stateContext;
+let stateTimers;
 
 //private functions
 const isRun = () => !!currState;
 
 const safeTransitionTo = (nextInput) => isRun() && transitionTo(nextInput);
 
-const registerStateContext = () => {
-  if (stateContext) {
-    throw "State Machine: Context: Already has been registered";
-  }
-
-  stateContext = useContext();
-};
-
-const registerStateRouter = (addRouter, path) => {
-  if (stateRouter) {
-    throw "State Machine: Router: Already has been registered";
-  }
-
+const registerStateVariables = ({ addRouter, path }, timers) => {
   stateRouter = addRouter(path);
+  stateContext = useContext();
+  stateTimers = timers;
 };
 
 const getStateConfig = () => {
@@ -53,8 +44,17 @@ const getStateConfig = () => {
 };
 
 const getStateHandlers = (absPath, serverInterface, isFinalState, refs) => {
+  const { setTimeout, setInterval, clearTimeout, clearInterval } = stateTimers;
+  const stateTimersInterface = {
+    setTimeout,
+    setInterval,
+    clearTimeout,
+    clearInterval,
+  };
+
   const { handler, disposeHandler } = require(absPath)({
     server: serverInterface,
+    timers: stateTimersInterface,
     context: stateContext,
     refs,
   });
@@ -257,6 +257,7 @@ const invokeDisposeHandler = (state) => {
 const build = (
   { bindRouter },
   serverInterface,
+  timers,
   refs,
   routerPattern = /^\/api/
 ) => {
@@ -264,8 +265,10 @@ const build = (
     throw "State Machine: Already has been built";
   }
 
-  registerStateRouter(bindRouter, routerPattern);
-  registerStateContext();
+  registerStateVariables(
+    { addRouter: bindRouter, path: routerPattern },
+    timers
+  );
 
   const stateData = getStateData(serverInterface, refs);
   const stateConfig = getStateConfig();
@@ -283,6 +286,7 @@ const transitionTo = (nextInput) => {
     return false;
   }
 
+  stateTimers.clear();
   stateRouter.reset();
 
   invokeDisposeHandler(currState);
@@ -306,9 +310,9 @@ const run = (state) => {
   invokeHandler(currState);
 };
 
-module.exports = (server, refs, routerPattern) => {
+module.exports = (server, timers, refs, routerPattern) => {
   const { builder: serverBuilder, interface: serverInterface } = server;
-  build(serverBuilder, serverInterface, refs, routerPattern);
+  build(serverBuilder, serverInterface, timers, refs, routerPattern);
 
   return () => initState && run(initState);
 };

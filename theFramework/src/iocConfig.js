@@ -2,7 +2,15 @@ module.exports = {
   "core/framework": {
     handler: ({ dependencies, props }) =>
       require("./core/framework")(...dependencies, ...props),
-    dependencies: ["core/server/server", "helpers/functionHelper"],
+    dependencies: [
+      "core/server/server",
+      "core/timers",
+      "helpers/functionHelper",
+    ],
+  },
+  "core/timers": {
+    handler: () => require("./core/modules/preciseTimers"),
+    isSingleton: true,
   },
   "core/server/server": {
     handler: ({ dependencies, resolve }) =>

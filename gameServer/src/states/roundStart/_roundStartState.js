@@ -9,7 +9,7 @@ const generateWorld = (server) => {
   const size = 5;
   const maxBrickHealth = 100;
   const mapConfig = {
-    "0:3": { type: "brick", health: maxBrickHealth },
+    "0:3": { type: "brick", health: maxBrickHealth / 2 },
     "1:1": { type: "forest" },
     "1:2": { type: "concrete" },
     "1:3": { type: "forest" },
@@ -18,7 +18,7 @@ const generateWorld = (server) => {
     "3:1": { type: "forest" },
     "3:2": { type: "concrete" },
     "3:3": { type: "forest" },
-    "4:1": { type: "brick", health: maxBrickHealth },
+    "4:1": { type: "brick", health: maxBrickHealth / 2 },
   };
 
   const map = times(size, () => Array(size).fill(""));
